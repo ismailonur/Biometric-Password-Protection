@@ -4,9 +4,8 @@ import Signup from '../screens/Signup'
 import Login from '../screens/Login'
 
 export default class Welcome extends Component {
-    onPress() {
-        <Login />
-    }
+
+        
 
     render() {
         return (
@@ -18,13 +17,13 @@ export default class Welcome extends Component {
                     <Button
                         title="Kayıt Ol"
                         color="#aa0000"
-                        onPress={() => this.onPress()}
+                        onPress={() => this.props.navigation.navigate("Login")}
                     />
 
                     <Button
                         title="Giriş Yap"
                         color="#aa0000"
-                        onPress={() => { return (<Login />) }}
+                        onPress={() => this.props.navigation.navigate("Signup")}
                     />
                 </View>
             </View>
