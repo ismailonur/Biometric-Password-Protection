@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "935877629173",
+    "firebase_url": "https://biometric-authentication-99864.firebaseio.com",
+    "project_id": "biometric-authentication-99864",
+    "storage_bucket": "biometric-authentication-99864.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935877629173:android:935297ce0ea11d414121bc",
+        "android_client_info": {
+          "package_name": "com.biometricpasswordprotection"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935877629173-sb7eb85549s6ejq81c6d42us3hisan74.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0uVBdEc2n5tw4nixicvIV9AIIUq3vJtc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935877629173-sb7eb85549s6ejq81c6d42us3hisan74.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
