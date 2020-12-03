@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Button, Text, View, Image, StyleSheet, Alert } from 'react-native'
+import { View, Image, StyleSheet, Alert } from 'react-native'
+import { Container, Header, Content, Button, Text, } from 'native-base';
 
 export default class Welcome extends Component {
 
@@ -10,17 +11,15 @@ export default class Welcome extends Component {
                 <Image style={styles.image}
                     source={require('../images/1.webp')} />
                 <View>
-                    <Button
-                        title="Giriş Yap"
-                        color="#aa0000"
-                        onPress={() => this.props.navigation.navigate("Login")}
-                    />
+                    <Button bordered rounded block danger style={styles.button}
+                        onPress={() => this.props.navigation.navigate("Login")}>
+                        <Text>GİRİŞ YAP</Text>
+                    </Button>
 
-                    <Button
-                        title="Kayıt Ol"
-                        color="#aa0000"
-                        onPress={() => this.props.navigation.navigate("Signup")}
-                    />
+                    <Button bordered rounded block danger style={styles.button}
+                        onPress={() => this.props.navigation.navigate("Signup")}>
+                        <Text>Kayıt Ol</Text>
+                    </Button>
                 </View>
             </View>
         )
@@ -44,5 +43,12 @@ const styles = StyleSheet.create({
         width: '50%',
         height: '50%',
         resizeMode: 'center'
+    },
+
+    button: {
+        justifyContent: 'center',
+        alignSelf: 'center',
+        marginVertical: 10,
+        marginHorizontal: 100
     }
 })
