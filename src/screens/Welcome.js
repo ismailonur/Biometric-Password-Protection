@@ -1,11 +1,7 @@
 import React, { Component } from 'react'
 import { Button, Text, View, Image, StyleSheet, Alert } from 'react-native'
-import Signup from '../screens/Signup'
-import Login from '../screens/Login'
 
 export default class Welcome extends Component {
-
-        
 
     render() {
         return (
@@ -15,19 +11,18 @@ export default class Welcome extends Component {
                     source={require('../images/1.webp')} />
                 <View>
                     <Button
-                        title="Kayıt Ol"
+                        title="Giriş Yap"
                         color="#aa0000"
                         onPress={() => this.props.navigation.navigate("Login")}
                     />
 
                     <Button
-                        title="Giriş Yap"
+                        title="Kayıt Ol"
                         color="#aa0000"
                         onPress={() => this.props.navigation.navigate("Signup")}
                     />
                 </View>
             </View>
-
         )
     }
 }
