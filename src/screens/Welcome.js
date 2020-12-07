@@ -7,9 +7,9 @@ export default class Welcome extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.text}> Welcome </Text>
+                <Text style={styles.text}> Biyometrik Doğrulamalı Şifre Koruma </Text>
                 <Image style={styles.image}
-                    source={require('../images/1.webp')} />
+                    source={require('../images/01.gif')} />
                 <View>
                     <Button bordered rounded block danger style={styles.button}
                         onPress={() => this.props.navigation.navigate("Login")}>
@@ -29,20 +29,24 @@ export default class Welcome extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: '#141414',
         justifyContent: 'center',
         alignItems: 'center'
     },
 
     text: {
         color: '#fff',
-        fontSize: 35
+        fontSize: 35,
+        textAlign: 'center',
+        fontWeight: 'bold',
+        textShadowColor: '#8c8c8c',
+        textShadowRadius: 20,
     },
 
     image: {
-        width: '50%',
+        width: '100%',
         height: '50%',
-        resizeMode: 'center'
+        resizeMode: 'contain'
     },
 
     button: {

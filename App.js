@@ -13,30 +13,23 @@ function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#f4511e',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }}
+         screenOptions={{
+           headerStyle: {
+             backgroundColor: '#1b1b1b',
+           },
+           headerTintColor: '#fff',
+           headerTitleStyle: {
+             fontWeight: 'bold',
+           },
+         }}
       >
-        <Stack.Screen name="Welcome" component={Welcome} options={{
-          title: 'Overview',
-          headerStyle: {
-            backgroundColor: '#f4511e',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }} />
-        <Stack.Screen name="Login" component={Login} options={{ title: 'Overview' }} />
-        <Stack.Screen name="Signup" component={Signup} options={{ title: 'Overview' }} />
+        <Stack.Screen name="Welcome" component={Welcome} 
+         options={{ title: 'Hoşgeldiniz'}} 
+        />
+        <Stack.Screen name="Login" component={Login} options={{ title: 'Giriş Yap' }} />
+        <Stack.Screen name="Signup" component={Signup} options={{ title: 'Kayıt Ol' }} />
         <Stack.Screen name="Main" component={Main} options={{
-          title: 'Overview', 
+          title: 'Şifreler', 
           headerLeft: false
         }} />
       </Stack.Navigator>

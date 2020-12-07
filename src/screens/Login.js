@@ -32,7 +32,7 @@ export default class Login extends Component {
                             <Label>Email</Label>
                             <Input onChangeText={(text) => this.setState({ email: text })} />
                         </Item>
-                        <Item floatingLabel last>
+                        <Item floatingLabel>
                             <Label>Şifre</Label>
                             <Input onChangeText={(text) => this.setState({ password: text })} />
                         </Item>

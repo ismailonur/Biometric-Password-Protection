@@ -14,7 +14,7 @@ export default class Main extends Component {
            'Uygulamadan Çık',
            'Uygulamadan çıkılsın mı?', [{
                text: 'Hayır',
-               onPress: () => console.log('Cancel Pressed'),
+               onPress: () => console.log('Hayır Basıldı!'),
                style: 'cancel'
            }, {
                text: 'Evet',
