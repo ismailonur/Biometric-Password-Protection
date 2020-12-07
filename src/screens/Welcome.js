@@ -18,7 +18,7 @@ export default class Welcome extends Component {
 
                     <Button bordered rounded block danger style={styles.button}
                         onPress={() => this.props.navigation.navigate("Signup")}>
-                        <Text>Kayıt Ol</Text>
+                        <Text>KAYIT OL</Text>
                     </Button>
                 </View>
             </View>
