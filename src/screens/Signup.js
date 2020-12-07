@@ -1,11 +1,7 @@
 import React, { Component } from 'react'
 import { StyleSheet } from 'react-native'
-import ReactNativeBiometrics from 'react-native-biometrics'
 import { Container, Content, Form, Item, Input, Label, Button, Text, View } from 'native-base';
 import auth from '@react-native-firebase/auth';
-
-let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
-let payload = epochTimeSeconds + 'some message'
 
 export default class Signup extends Component {
 
@@ -14,6 +10,35 @@ export default class Signup extends Component {
         password: "",
         againPassword: "",
         phoneNumber: "",
+        code: "",
+        confirm: null
+    }
+
+    async CodeConfirm(){
+        alert(auth().currentUser.email)
+        const {verificationId, code} = this.state
+        try {
+            alert(auth().currentUser.email)
+            const credential = auth.PhoneAuthProvider.credential(
+              verificationId,
+              code,
+            );
+            let userData = await auth().currentUser.linkWithCredential(credential);
+            alert(userData.user);
+          } catch (error) {
+            if (error.code == 'auth/invalid-verification-code') {
+              alert('Invalid code.');
+            } else {
+              //alert('Account linking error');
+              alert(error)
+            }
+          }
+    }
+
+    async GoPhone(){
+        const confirmation = await auth().verifyPhoneNumber('+90 543-386-9448');
+        console.log(confirmation);
+        this.setState({confirm: confirmation.verificationId})
     }
 
     GoSignup() {
@@ -22,51 +47,28 @@ export default class Signup extends Component {
         if (password === againPassword) {
             auth()
                 .createUserWithEmailAndPassword(email, password)
-                .then(() => {
-                    alert('User account created & signed in!');
+                .then(async () => {
+                    alert('Kullanıcı Oluşturuldu & Giriş Yapılıyor!');
                     this.props.navigation.navigate("Main")
                 })
                 .catch(error => {
                     if (error.code === 'auth/email-already-in-use') {
-                        alert('That email address is already in use!');
+                        alert('Girilen e-posta adresi sistemde kayıtlı!');
                     }
 
                     if (error.code === 'auth/invalid-email') {
-                        alert('That email address is invalid!');
+                        alert('Bu e-posta adresi geçersiz!');
                     }
 
                     alert(error);
                 });
         }
         else {
-            alert("Şifreler Uyuşmuyor!");
+            alert("Girilen şifreler Uyuşmuyor!");
         }
-
     }
 
     render() {
-        ReactNativeBiometrics.createKeys('Confirm fingerprint')
-            .then((resultObject) => {
-                const { publicKey } = resultObject
-                alert(publicKey)
-                sendPublicKeyToServer(publicKey)
-            })
-
-        ReactNativeBiometrics.createSignature({
-            promptMessage: 'Sign in',
-            payload: payload
-        })
-            .then((resultObject) => {
-                const { success, signature } = resultObject
-
-                if (success) {
-                    alert(signature)
-                    verifySignatureWithServer(signature, payload)
-                }
-                else {
-                    alert("Olmadııııı")
-                }
-            })
         return (
             <Container >
                 <Content style={styles.container}>
@@ -87,10 +89,18 @@ export default class Signup extends Component {
                             <Label>Again Password</Label>
                             <Input onChangeText={(text) => this.setState({ againPassword: text })} />
                         </Item>
+                        <Item floatingLabel>
+                            <Label>Code</Label>
+                            <Input onChangeText={(text) => this.setState({ code: text })} />
+                        </Item>
                     </Form>
                     <Button light block rounded style={styles.signupButton}
                         onPress={() => this.GoSignup()}>
                         <Text>Kayıt Ol</Text>
+                    </Button>
+                    <Button light block rounded style={styles.signupButton}
+                        onPress={() => this.CodeConfirm()}>
+                        <Text>Code Confirm</Text>
                     </Button>
                 </Content>
             </Container>

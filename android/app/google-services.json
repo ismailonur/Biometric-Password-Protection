@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "935877629173-7enuv8cc1ovc39m8865ltl7tgg8nrn19.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.biometricpasswordprotection",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "935877629173-sb7eb85549s6ejq81c6d42us3hisan74.apps.googleusercontent.com",
           "client_type": 3
         }

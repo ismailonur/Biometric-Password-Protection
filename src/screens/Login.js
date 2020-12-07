@@ -16,7 +16,7 @@ export default class Login extends Component {
             .signInWithEmailAndPassword(email, password)
             .then((data) => {
                 this.props.navigation.navigate("Main")
-                //alert(JSON.stringify(data))
+                alert("Giriş Yapıldı!")
             })
             .catch((error) => {
                 alert(error)
@@ -33,7 +33,7 @@ export default class Login extends Component {
                             <Input onChangeText={(text) => this.setState({ email: text })} />
                         </Item>
                         <Item floatingLabel last>
-                            <Label>Password</Label>
+                            <Label>Şifre</Label>
                             <Input onChangeText={(text) => this.setState({ password: text })} />
                         </Item>
                     </Form>
