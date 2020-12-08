@@ -1,8 +1,10 @@
 import * as React from 'react';
-import { Text, View, BackHandler, Alert, FlatList, TouchableOpacity } from 'react-native'
+import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { ListItem, Avatar } from 'react-native-elements';
+import { ListItem } from 'react-native-elements';
+import { Container, Content, Form, Item, Input, Label, Button, Text } from 'native-base';
+import database from '@react-native-firebase/database';
 
 const Tab = createBottomTabNavigator();
 
@@ -55,16 +57,38 @@ const list = [
 
 export default class Main extends React.Component {
 
+    state = {
+        name: "",
+        password: "",
+        secondPassword: "",
+        charLength: "",
+        text:''
+    }
+
+        // From the RN documentation
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextProps !== this.props && nextState !== this.state;
+    }
+
+    generatePassword() {
+        var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#%^&*_+|?><,.-=",
+            retVal = "";
+        for (var i = 0, n = charset.length; i < this.state.charLength; ++i) {
+            retVal += charset.charAt(Math.floor(Math.random() * n));
+        }
+        alert(retVal);
+    }
+
     renderItem = ({ item }) => {
         return (
-            <TouchableOpacity onPress = {() => alert(item.name)} >
-            <ListItem bottomDivider>
-                <ListItem.Content>
-                    <ListItem.Title>{item.name}</ListItem.Title>
-                    <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
-                </ListItem.Content>
-                <ListItem.Chevron />
-            </ListItem>
+            <TouchableOpacity onPress={() => alert(item.name)} >
+                <ListItem bottomDivider>
+                    <ListItem.Content>
+                        <ListItem.Title>{item.name}</ListItem.Title>
+                        <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
+                    </ListItem.Content>
+                    <ListItem.Chevron />
+                </ListItem>
             </TouchableOpacity>
         )
     }
@@ -79,19 +103,75 @@ export default class Main extends React.Component {
         );
     }
 
+
+    AddFirebase(){
+        alert('firebase')
+    }
+
     AddPassword() {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>AddPassword!</Text>
-            </View>
+            <Container >
+                <Content style={styles.container}>
+                    <Form>
+                        <Item floatingLabel>
+                            <Label>İsim</Label>
+                            <Input
+                                //textAlign='center'
+                                autoCompleteType='email'
+                                keyboardType='email-address'
+                                textContentType='emailAddress' onChangeText={(text) => this.setState({ name: text })} />
+                        </Item>
+                        <Item floatingLabel>
+                            <Label>Şifre</Label>
+                            <Input
+                                //textAlign='center'
+                                autoCompleteType='password'
+                                keyboardType='visible-password'
+                                textContentType='password'
+                                onChangeText={(text) => this.setState({ password: text })} />
+                        </Item>
+                        <Item floatingLabel>
+                            <Label>Şifre Tekrar</Label>
+                            <Input
+                                //textAlign='center'
+                                autoCompleteType='password'
+                                keyboardType='visible-password'
+                                textContentType='password'
+                                onChangeText={(text) => this.setState({ secondPassword: text })} />
+                        </Item>
+                    </Form>
+                    <Button light block rounded style={styles.loginButton}
+                        onPress={() => this.AddFirebase()}>
+                        <Text>ŞİFRE'Yİ KAYDET</Text>
+                    </Button>
+                </Content>
+            </Container>
         );
     }
 
+
     CreatePassword() {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>CreatePassword!</Text>
-            </View>
+            <Container >
+                <Content style={styles.createPassword}>
+                    <Form>
+                        <Item rounded>
+                            <Input
+                                placeholder='Şifre Karakter Uzunluğu'
+                                maxLength={2}
+                                textAlign='center'
+                                keyboardType='number-pad'
+                                //value={this.state.charLength}
+                                onChangeText={text => this.setState({charLength: text})}
+                                 />
+                        </Item>
+                    </Form>
+                    <Button light block rounded style={styles.loginButton}
+                        onPress={() => alert("Şifre Kayıt Edildi")}>
+                        <Text>ŞİFRE OLUŞTUR</Text>
+                    </Button>
+                </Content>
+            </Container>
         );
     }
 
@@ -139,7 +219,7 @@ export default class Main extends React.Component {
                                 : 'server-outline';
                         } else if (route.name === 'Şifre Oluştur') {
                             iconName = focused ? 'key-outline' : 'key-outline';
-                        } else if(route.name === 'Şifre Ekle'){
+                        } else if (route.name === 'Şifre Ekle') {
                             iconName = focused ? 'finger-print-outline' : 'finger-print-outline';
                         }
 
@@ -153,9 +233,34 @@ export default class Main extends React.Component {
                 }}
             >
                 <Tab.Screen name="Şifreler" component={this.Passwords.bind(this)} />
-                <Tab.Screen name="Şifre Ekle" component={this.AddPassword} />
-                <Tab.Screen name="Şifre Oluştur" component={this.CreatePassword} />
+                <Tab.Screen name="Şifre Ekle" component={this.AddPassword.bind(this)} />
+                <Tab.Screen name="Şifre Oluştur" component={this.CreatePassword.bind(this)} />
             </Tab.Navigator>
         )
     }
 }
+
+
+const styles = StyleSheet.create({
+
+    container: {
+        flex: 1,
+        backgroundColor: '#1b1b1b',
+        paddingVertical: 130
+    },
+
+    createPassword: {
+        flex: 1,
+        backgroundColor: '#1b1b1b',
+        paddingVertical: 130,
+        paddingHorizontal: 80
+
+    },
+
+    loginButton: {
+        justifyContent: 'center',
+        alignSelf: 'center',
+        marginVertical: 100,
+        marginHorizontal: 50
+    }
+})
