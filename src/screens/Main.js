@@ -1,17 +1,45 @@
 import * as React from 'react';
-import { Text, View, BackHandler, Alert } from 'react-native'
+import { Text, View, BackHandler, Alert, FlatList, TouchableOpacity } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { ListItem, Avatar } from 'react-native-elements';
 
 const Tab = createBottomTabNavigator();
 
+const list = [
+    {
+        name: 'Instagram',
+        subtitle: '***************'
+    },
+    {
+        name: 'Facebook',
+        subtitle: '***************'
+    },
+]
+
 export default class Main extends React.Component {
+
+    renderItem = ({ item }) => {
+        return (
+            <TouchableOpacity onPress = {() => alert(item.name)} >
+            <ListItem bottomDivider>
+                <ListItem.Content>
+                    <ListItem.Title>{item.name}</ListItem.Title>
+                    <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
+                </ListItem.Content>
+                <ListItem.Chevron />
+            </ListItem>
+            </TouchableOpacity>
+        )
+    }
 
     Passwords() {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Passwords!</Text>
-            </View>
+            <FlatList
+                keyExtractor={(item, index) => index.toString()}
+                data={list}
+                renderItem={this.renderItem}
+            />
         );
     }
 
@@ -78,7 +106,7 @@ export default class Main extends React.Component {
                     inactiveTintColor: 'gray',
                 }}
             >
-                <Tab.Screen name="Şifreler" component={this.Passwords} />
+                <Tab.Screen name="Şifreler" component={this.Passwords.bind(this)} />
                 <Tab.Screen name="Şifre Oluşturucu" component={this.CreatePassword} />
             </Tab.Navigator>
         )
