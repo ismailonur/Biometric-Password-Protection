@@ -33,7 +33,7 @@ function App() {
       let stacks;
       if (user !== null) {
         stacks =  <Stack.Screen name="Main" component={Main} options={{
-          title: 'Şifreler', 
+          title: 'Biyometrik Koruma', 
           headerLeft: false
         }} />;
         return stacks;

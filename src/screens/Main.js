@@ -15,6 +15,42 @@ const list = [
         name: 'Facebook',
         subtitle: '***************'
     },
+    {
+        name: 'Email',
+        subtitle: '***************'
+    },
+    {
+        name: 'Github',
+        subtitle: '***************'
+    },
+    {
+        name: 'Linkedin',
+        subtitle: '***************'
+    },
+    {
+        name: 'TWAS',
+        subtitle: '***************'
+    },
+    {
+        name: 'Reddit',
+        subtitle: '***************'
+    },
+    {
+        name: 'Medium',
+        subtitle: '***************'
+    },
+    {
+        name: 'WordPress',
+        subtitle: '***************'
+    },
+    {
+        name: 'Pinterest',
+        subtitle: '***************'
+    },
+    {
+        name: 'Twitter',
+        subtitle: '***************'
+    },
 ]
 
 export default class Main extends React.Component {
@@ -40,6 +76,14 @@ export default class Main extends React.Component {
                 data={list}
                 renderItem={this.renderItem}
             />
+        );
+    }
+
+    AddPassword() {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text>AddPassword!</Text>
+            </View>
         );
     }
 
@@ -93,8 +137,10 @@ export default class Main extends React.Component {
                             iconName = focused
                                 ? 'server-outline'
                                 : 'server-outline';
-                        } else if (route.name === 'Şifre Oluşturucu') {
+                        } else if (route.name === 'Şifre Oluştur') {
                             iconName = focused ? 'key-outline' : 'key-outline';
+                        } else if(route.name === 'Şifre Ekle'){
+                            iconName = focused ? 'finger-print-outline' : 'finger-print-outline';
                         }
 
                         // You can return any component that you like here!
@@ -107,7 +153,8 @@ export default class Main extends React.Component {
                 }}
             >
                 <Tab.Screen name="Şifreler" component={this.Passwords.bind(this)} />
-                <Tab.Screen name="Şifre Oluşturucu" component={this.CreatePassword} />
+                <Tab.Screen name="Şifre Ekle" component={this.AddPassword} />
+                <Tab.Screen name="Şifre Oluştur" component={this.CreatePassword} />
             </Tab.Navigator>
         )
     }
