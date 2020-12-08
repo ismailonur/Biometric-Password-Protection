@@ -5,6 +5,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ListItem } from 'react-native-elements';
 import { Container, Content, Form, Item, Input, Label, Button, Text } from 'native-base';
 import database from '@react-native-firebase/database';
+import auth from '@react-native-firebase/auth';
 
 const Tab = createBottomTabNavigator();
 
@@ -62,12 +63,32 @@ export default class Main extends React.Component {
         password: "",
         secondPassword: "",
         charLength: "",
-        text:''
+        text: '',
+        allPassword: [],
+        firebaseControl: false
     }
 
-        // From the RN documentation
+    async componentDidMount() {
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
+        this.LoadingPassword();
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    // From the RN documentation
     shouldComponentUpdate(nextProps, nextState) {
+        if (nextState.allPassword !== this.state.allPassword) {
+            return true
+        }
         return nextProps !== this.props && nextState !== this.state;
+    }
+
+    async LoadingPassword(){
+        const data = await database().ref(`PASS/${auth().currentUser.uid}`).once('value')
+        const snapshot = Object.values(data.val())
+        this.setState({ allPassword: snapshot, firebaseControl: true })
     }
 
     generatePassword() {
@@ -94,18 +115,33 @@ export default class Main extends React.Component {
     }
 
     Passwords() {
-        return (
-            <FlatList
-                keyExtractor={(item, index) => index.toString()}
-                data={list}
-                renderItem={this.renderItem}
-            />
-        );
+        if (this.state.firebaseControl === true) {
+            return (
+                <FlatList
+                    keyExtractor={(item, index) => index.toString()}
+                    data={this.state.allPassword}
+                    renderItem={this.renderItem}
+                />
+            );
+        } else {
+            return <Text>Yükleniyor...</Text>
+        }
     }
 
 
-    AddFirebase(){
+    AddFirebase() {
         alert('firebase')
+        const { name, password, secondPassword } = this.state
+        if (password !== secondPassword) {
+            alert('Şifreler Uyuşmuyor!')
+        }
+        else {
+            database().ref(`PASS/${auth().currentUser.uid}/${name}`).set({
+                name: name,
+                subtitle: password
+            })
+            this.LoadingPassword();
+        }
     }
 
     AddPassword() {
@@ -162,8 +198,8 @@ export default class Main extends React.Component {
                                 textAlign='center'
                                 keyboardType='number-pad'
                                 //value={this.state.charLength}
-                                onChangeText={text => this.setState({charLength: text})}
-                                 />
+                                onChangeText={text => this.setState({ charLength: text })}
+                            />
                         </Item>
                     </Form>
                     <Button light block rounded style={styles.loginButton}
@@ -196,14 +232,6 @@ export default class Main extends React.Component {
         }
         )
         return true;
-    }
-
-    componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
-    }
-
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
     }
 
     render() {
