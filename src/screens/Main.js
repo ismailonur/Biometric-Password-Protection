@@ -7,18 +7,18 @@ const Tab = createBottomTabNavigator();
 
 export default class Main extends React.Component {
 
-    HomeScreen() {
+    Passwords() {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Home!</Text>
+                <Text>Passwords!</Text>
             </View>
         );
     }
 
-    SettingsScreen() {
+    CreatePassword() {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <Text>Settings!</Text>
+                <Text>CreatePassword!</Text>
             </View>
         );
     }
@@ -61,12 +61,12 @@ export default class Main extends React.Component {
                     tabBarIcon: ({ focused, color, size }) => {
                         let iconName;
 
-                        if (route.name === 'Home') {
+                        if (route.name === 'Şifreler') {
                             iconName = focused
-                                ? 'md-add'
-                                : 'md-add';
-                        } else if (route.name === 'Settings') {
-                            iconName = focused ? 'md-add' : 'md-add';
+                                ? 'server-outline'
+                                : 'server-outline';
+                        } else if (route.name === 'Şifre Oluşturucu') {
+                            iconName = focused ? 'key-outline' : 'key-outline';
                         }
 
                         // You can return any component that you like here!
@@ -78,8 +78,8 @@ export default class Main extends React.Component {
                     inactiveTintColor: 'gray',
                 }}
             >
-                <Tab.Screen name="Home" component={this.HomeScreen} />
-                <Tab.Screen name="Settings" component={this.SettingsScreen} />
+                <Tab.Screen name="Şifreler" component={this.Passwords} />
+                <Tab.Screen name="Şifre Oluşturucu" component={this.CreatePassword} />
             </Tab.Navigator>
         )
     }
