@@ -2,11 +2,13 @@ import React, { useState, useEffect }  from 'react';
 import { View, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import auth from '@react-native-firebase/auth';
+
+// Screens
 import Welcome from './src/screens/Welcome';
 import Login from './src/screens/Login';
 import Signup from './src/screens/Signup';
 import Main from './src/screens/Main';
-import auth from '@react-native-firebase/auth';
 
 const Stack = createStackNavigator();
 
@@ -40,7 +42,7 @@ function App() {
       }
 
       stacks = <Stack.Screen name={"Welcome"} component={Welcome} 
-      options={{ title: "hoş geldin"}} 
+      options={{ title: "Güvenle Sakla"}} 
      />
       return stacks;
     }

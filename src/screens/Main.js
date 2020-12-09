@@ -1,9 +1,10 @@
+
 import * as React from 'react';
 import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ListItem } from 'react-native-elements';
-import { Container, Content, Form, Item, Input, Label, Button, Text } from 'native-base';
+import { Root, Container, Content, Form, Item, Input, Label, Button, Text, Toast } from 'native-base';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 
@@ -58,6 +59,13 @@ const list = [
 
 export default class Main extends React.Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            showToast: false
+        };
+    }
+
     state = {
         name: "",
         password: "",
@@ -85,14 +93,14 @@ export default class Main extends React.Component {
         return nextProps !== this.props && nextState !== this.state;
     }
 
-    async LoadingPassword(){
+    async LoadingPassword() {
         const data = await database().ref(`PASS/${auth().currentUser.uid}`).once('value')
         const snapshot = Object.values(data.val())
         this.setState({ allPassword: snapshot, firebaseControl: true })
     }
 
     generatePassword() {
-        var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#%^&*_+|?><,.-=",
+        var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!^&*_+|?><,-=",
             retVal = "";
         for (var i = 0, n = charset.length; i < this.state.charLength; ++i) {
             retVal += charset.charAt(Math.floor(Math.random() * n));
@@ -127,7 +135,6 @@ export default class Main extends React.Component {
             return <Text>Yükleniyor...</Text>
         }
     }
-
 
     AddFirebase() {
         alert('firebase')
@@ -185,29 +192,48 @@ export default class Main extends React.Component {
         );
     }
 
-
     CreatePassword() {
         return (
-            <Container >
-                <Content style={styles.createPassword}>
-                    <Form>
-                        <Item rounded>
-                            <Input
-                                placeholder='Şifre Karakter Uzunluğu'
-                                maxLength={2}
-                                textAlign='center'
-                                keyboardType='number-pad'
-                                //value={this.state.charLength}
-                                onChangeText={text => this.setState({ charLength: text })}
-                            />
-                        </Item>
-                    </Form>
-                    <Button light block rounded style={styles.loginButton}
-                        onPress={() => alert("Şifre Kayıt Edildi")}>
-                        <Text>ŞİFRE OLUŞTUR</Text>
-                    </Button>
-                </Content>
-            </Container>
+            <Root>
+                <Container >
+                    <Content padder style={styles.createPassword}>
+                        <Form>
+                            <Item rounded>
+                                <Input
+                                    placeholder='Şifre Karakter Uzunluğu'
+                                    maxLength={2}
+                                    textAlign='center'
+                                    keyboardType='number-pad'
+                                    //value={this.state.charLength}
+                                    onChangeText={text => this.setState({ charLength: text })}
+                                />
+                            </Item>
+                        </Form>
+
+
+                        <Button warning
+                            onPress={() =>
+                                Toast.show({
+                                    text: "Wrong password!",
+                                    buttonText: "Okay",
+                                    type: "warning"
+                                })}
+                        >
+                            <Text>Warning Toast</Text>
+                        </Button>
+                        <Button danger
+                            onPress={() =>
+                                Toast.show({
+                                    text: "Wrong password!",
+                                    buttonText: "Okay",
+                                    type: "danger"
+                                })}
+                        >
+                            <Text>Danger Toast</Text>
+                        </Button>
+                    </Content>
+                </Container>
+            </Root>
         );
     }
 
