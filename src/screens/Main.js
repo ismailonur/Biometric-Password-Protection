@@ -6,9 +6,7 @@ import { ListItem } from 'react-native-elements';
 import { Root, Container, Content, Form, Item, Input, Label, Button, Text, Toast, Icon } from 'native-base';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
-import { writeToClipboard } from './Utilities';
 import Clipboard from '@react-native-community/clipboard';
-import { Overlay } from 'react-native-elements';
 
 const Tab = createBottomTabNavigator();
 
@@ -76,10 +74,6 @@ class Main extends Component {
         bioPassword: ''
     }
 
-    setModalVisible = (visible, name, password) => {
-        this.setState({ modalVisible: visible, bioName: name, bioPassword: password });
-    }
-
     async componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
         this.LoadingPassword();
@@ -126,6 +120,10 @@ class Main extends Component {
         return nextProps !== this.props && nextState !== this.state;
     }
 
+    setModalVisible = (visible, name, password) => {
+        this.setState({ modalVisible: visible, bioName: name, bioPassword: password });
+    }
+
     async LoadingPassword() {
         const data = await database().ref(`PASS/${auth().currentUser.uid}`).once('value')
         const snapshot = Object.values(data.val())
@@ -141,9 +139,8 @@ class Main extends Component {
         this.setState({ retVal: retValFor })
     }
 
-    Model() {
+    Modal() {
         const { modalVisible } = this.state;
-        //this.setModalVisible(true)
 
         if (modalVisible === true) {
             return (
@@ -184,7 +181,7 @@ class Main extends Component {
                     <ListItem bottomDivider>
                         <ListItem.Content>
                             <ListItem.Title>{item.name}</ListItem.Title>
-                            <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
+                            <ListItem.Subtitle>***************</ListItem.Subtitle>
                         </ListItem.Content>
                         <ListItem.Chevron />
                     </ListItem>
@@ -203,7 +200,7 @@ class Main extends Component {
                         renderItem={this.renderItem}
                     />
                     {
-                        this.Model()
+                        this.Modal()
                     }
                 </View>
             );
