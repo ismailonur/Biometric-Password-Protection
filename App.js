@@ -9,7 +9,7 @@ import Welcome from './src/screens/Welcome';
 import Login from './src/screens/Login';
 import Signup from './src/screens/Signup';
 import Main from './src/screens/Main';
-import uti from './src/screens/Utilities';
+import BioControl from './src/screens/BiometricControl';
 
 const Stack = createStackNavigator();
 
@@ -35,11 +35,13 @@ function App() {
       //auth().signOut();
       let stacks;
       if (user !== null) {
-        stacks =  <Stack.Screen name="Main" component={Main} options={{
-          title: 'Biyometrik Koruma', 
-          headerLeft: false
-        }} />;
-        return stacks;
+        if(true){
+          stacks =  <Stack.Screen name="BioControl" component={BioControl} options={{
+            title: 'Biyometrik Koruma', 
+            headerLeft: false
+          }} />;
+          return stacks;
+        }
       }
 
       stacks = <Stack.Screen name={"Welcome"} component={Welcome} 
@@ -63,6 +65,7 @@ function App() {
       >
         
         { checkUser() }
+        <Stack.Screen name="Main" component={Main} options={{ title: 'Biyometrik Koruma', headerLeft: false }} />
         <Stack.Screen name="Login" component={Login} options={{ title: 'Giriş Yap' }} />
         <Stack.Screen name="Signup" component={Signup} options={{ title: 'Kayıt Ol' }} />
        
