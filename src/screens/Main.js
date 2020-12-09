@@ -231,13 +231,15 @@ export default class Main extends React.Component {
                             </Item>
                         </Form>
 
-                        <Button onPress={() => this.generatePassword()}>
+                        <Button style={styles.loginButton}
+                        onPress={() => this.generatePassword()}>
                             <Text>ŞİFRE OLUŞTUR</Text>
                         </Button>
 
-                        <Text>{this.state.retVal}</Text>
+                        <Text style={styles.newPassText}>{this.state.retVal}</Text>
 
                         <Button iconLeft
+                        style={styles.copyButton}
                             onPress={() =>
                                 Toast.show({
                                     text: "Şifre Kayıt Edildi!",
@@ -300,7 +302,7 @@ const styles = StyleSheet.create({
     createPassword: {
         flex: 1,
         backgroundColor: '#1b1b1b',
-        paddingVertical: 130,
+        paddingVertical: 100,
         paddingHorizontal: 80
 
     },
@@ -309,6 +311,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',
         marginVertical: 100,
-        marginHorizontal: 50
+        marginHorizontal: 30
+    },
+
+    copyButton:{
+        justifyContent: 'center',
+        alignSelf: 'center',
+        marginVertical: 20,
+        marginHorizontal: 30
+    },
+
+    newPassText:{
+        color: '#fff',
+        textAlign: 'center'
     }
 })
