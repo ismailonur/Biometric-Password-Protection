@@ -150,7 +150,7 @@ class Main extends Component {
     Modal() {
         const { bioModalVisible, modalVisible } = this.state;
 
-        this.setState({modalVisible: false})
+        this.setState({ modalVisible: false })
 
         if (bioModalVisible === true) {
             return (
@@ -171,7 +171,7 @@ class Main extends Component {
                                 <TouchableHighlight
                                     style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
                                     onPress={() => {
-                                        this.setState({bioModalVisible: false, modalVisible: false});
+                                        this.setState({ bioModalVisible: false, modalVisible: false });
                                     }}
                                 >
                                     <Text style={styles.textStyle}>        Tamam        </Text>
@@ -324,27 +324,27 @@ class Main extends Component {
 
     render() {
 
-        if(this.state.modalVisible === true){
+        if (this.state.modalVisible === true) {
             ReactNativeBiometrics.createKeys('Confirm fingerprint')
-            .then((resultObject) => {
-                const { publicKey } = resultObject
-                //alert(publicKey)
-            })
+                .then((resultObject) => {
+                    const { publicKey } = resultObject
+                    //alert(publicKey)
+                })
 
-        ReactNativeBiometrics.createSignature({
-            promptMessage: 'Sign in',
-            payload: payload
-        })
-            .then((resultObject) => {
-                const { success, signature } = resultObject
-
-                if (success) {
-                    this.setState({bioModalVisible: true})
-                }
-                else {
-                    alert("Giriş Sağlanamadı!")
-                }
+            ReactNativeBiometrics.createSignature({
+                promptMessage: 'Parmak İzi Doğrula',
+                payload: payload
             })
+                .then((resultObject) => {
+                    const { success, signature } = resultObject
+
+                    if (success) {
+                        this.setState({ bioModalVisible: true })
+                    }
+                    else {
+                        alert("Parmak İzi Doğrulanamadı!")
+                    }
+                })
         }
 
         return (
@@ -363,7 +363,6 @@ class Main extends Component {
                             iconName = focused ? 'finger-print-outline' : 'finger-print-outline';
                         }
 
-                        // You can return any component that you like here!
                         return <Ionicons name={iconName} size={size} color={color} />;
                     },
                 })}

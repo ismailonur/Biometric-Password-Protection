@@ -10,8 +10,6 @@ export default class BiometricControl extends Component {
         ReactNativeBiometrics.createKeys('Confirm fingerprint')
             .then((resultObject) => {
                 const { publicKey } = resultObject
-                //alert(publicKey)
-                sendPublicKeyToServer(publicKey)
             })
 
         ReactNativeBiometrics.createSignature({
@@ -23,7 +21,6 @@ export default class BiometricControl extends Component {
 
                 if (success) {
                     this.props.navigation.navigate("Main")
-                    verifySignatureWithServer(signature, payload)
                 }
                 else{
                     alert("Giriş Sağlanamadı!")
