@@ -7,6 +7,10 @@ import { Root, Container, Content, Form, Item, Input, Label, Button, Text, Toast
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import Clipboard from '@react-native-community/clipboard';
+import ReactNativeBiometrics from 'react-native-biometrics'
+
+let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
+let payload = epochTimeSeconds + 'some message'
 
 const Tab = createBottomTabNavigator();
 
@@ -71,7 +75,8 @@ class Main extends Component {
         retVal: "Şifre",
         modalVisible: false,
         bioName: '',
-        bioPassword: ''
+        bioPassword: '',
+        bioModalVisible: false
     }
 
     async componentDidMount() {
@@ -117,6 +122,9 @@ class Main extends Component {
         if (nextState.modalVisible !== this.state.modalVisible) {
             return true
         }
+        if (nextState.bioModalVisible !== this.state.bioModalVisible) {
+            return true
+        }
         return nextProps !== this.props && nextState !== this.state;
     }
 
@@ -140,15 +148,17 @@ class Main extends Component {
     }
 
     Modal() {
-        const { modalVisible } = this.state;
+        const { bioModalVisible, modalVisible } = this.state;
 
-        if (modalVisible === true) {
+        this.setState({modalVisible: false})
+
+        if (bioModalVisible === true) {
             return (
                 <View>
                     <Modal
                         animationType="slide"
                         transparent={true}
-                        visible={modalVisible}
+                        visible={bioModalVisible}
                         onRequestClose={() => {
                             Alert.alert("Modal has been closed.");
                         }}
@@ -161,7 +171,7 @@ class Main extends Component {
                                 <TouchableHighlight
                                     style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
                                     onPress={() => {
-                                        this.setModalVisible(!modalVisible);
+                                        this.setState({bioModalVisible: false, modalVisible: false});
                                     }}
                                 >
                                     <Text style={styles.textStyle}>        Tamam        </Text>
@@ -313,6 +323,30 @@ class Main extends Component {
     }
 
     render() {
+
+        if(this.state.modalVisible === true){
+            ReactNativeBiometrics.createKeys('Confirm fingerprint')
+            .then((resultObject) => {
+                const { publicKey } = resultObject
+                //alert(publicKey)
+            })
+
+        ReactNativeBiometrics.createSignature({
+            promptMessage: 'Sign in',
+            payload: payload
+        })
+            .then((resultObject) => {
+                const { success, signature } = resultObject
+
+                if (success) {
+                    this.setState({bioModalVisible: true})
+                }
+                else {
+                    alert("Giriş Sağlanamadı!")
+                }
+            })
+        }
+
         return (
             <Tab.Navigator
                 screenOptions={({ route }) => ({
