@@ -7,6 +7,8 @@ import { ListItem } from 'react-native-elements';
 import { Root, Container, Content, Form, Item, Input, Label, Button, Text, Toast, Icon } from 'native-base';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
+import { writeToClipboard } from './Utilities';
+import Clipboard from '@react-native-community/clipboard';
 
 const Tab = createBottomTabNavigator();
 
@@ -126,7 +128,7 @@ export default class Main extends React.Component {
         for (var i = 0, n = charset.length; i < this.state.charLength; ++i) {
             retValFor += charset.charAt(Math.floor(Math.random() * n));
         }
-        this.setState({retVal: retValFor })
+        this.setState({ retVal: retValFor })
     }
 
     renderItem = ({ item }) => {
@@ -232,20 +234,24 @@ export default class Main extends React.Component {
                         </Form>
 
                         <Button style={styles.loginButton}
-                        onPress={() => this.generatePassword()}>
+                            onPress={() => this.generatePassword()}>
                             <Text>ŞİFRE OLUŞTUR</Text>
                         </Button>
 
                         <Text style={styles.newPassText}>{this.state.retVal}</Text>
 
                         <Button iconLeft
-                        style={styles.copyButton}
-                            onPress={() =>
+                            style={styles.copyButton}
+                            onPress={() => {
+                                Clipboard.setString(this.state.retVal);
                                 Toast.show({
-                                    text: "Şifre Kayıt Edildi!",
+                                    text: "Şifre Kopyalandı!",
                                     buttonText: "Tamam",
                                     type: "success"
-                                })}>
+                                })
+                            }
+                            }
+                        >
                             <Icon name='copy' />
                             <Text>Kopyala</Text>
                         </Button>
@@ -302,7 +308,7 @@ const styles = StyleSheet.create({
     createPassword: {
         flex: 1,
         backgroundColor: '#1b1b1b',
-        paddingVertical: 100,
+        paddingVertical: 150,
         paddingHorizontal: 80
 
     },
@@ -310,18 +316,18 @@ const styles = StyleSheet.create({
     loginButton: {
         justifyContent: 'center',
         alignSelf: 'center',
-        marginVertical: 100,
+        marginVertical: 80,
         marginHorizontal: 30
     },
 
-    copyButton:{
+    copyButton: {
         justifyContent: 'center',
         alignSelf: 'center',
         marginVertical: 20,
         marginHorizontal: 30
     },
 
-    newPassText:{
+    newPassText: {
         color: '#fff',
         textAlign: 'center'
     }
