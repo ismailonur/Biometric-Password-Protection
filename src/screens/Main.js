@@ -4,7 +4,7 @@ import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet } from
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ListItem } from 'react-native-elements';
-import { Root, Container, Content, Form, Item, Input, Label, Button, Text, Toast } from 'native-base';
+import { Root, Container, Content, Form, Item, Input, Label, Button, Text, Toast, Icon } from 'native-base';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 
@@ -59,13 +59,6 @@ const list = [
 
 export default class Main extends React.Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            showToast: false
-        };
-    }
-
     state = {
         name: "",
         password: "",
@@ -73,7 +66,9 @@ export default class Main extends React.Component {
         charLength: "",
         text: '',
         allPassword: [],
-        firebaseControl: false
+        firebaseControl: false,
+        showToast: false,
+        retVal: ""
     }
 
     async componentDidMount() {
@@ -85,9 +80,35 @@ export default class Main extends React.Component {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
     }
 
+    onButtonPress = () => {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        // then navigate
+        navigate('NewScreen');
+    }
+
+    handleBackButton = () => {
+        Alert.alert(
+            'Uygulamadan Çık',
+            'Uygulamadan çıkılsın mı?', [{
+                text: 'Hayır',
+                onPress: () => console.log('Hayır Basıldı!'),
+                style: 'cancel'
+            }, {
+                text: 'Evet',
+                onPress: () => BackHandler.exitApp()
+            },], {
+            cancelable: false
+        }
+        )
+        return true;
+    }
+
     // From the RN documentation
     shouldComponentUpdate(nextProps, nextState) {
         if (nextState.allPassword !== this.state.allPassword) {
+            return true
+        }
+        if (nextState.retVal !== this.state.retVal) {
             return true
         }
         return nextProps !== this.props && nextState !== this.state;
@@ -101,11 +122,11 @@ export default class Main extends React.Component {
 
     generatePassword() {
         var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!^&*_+|?><,-=",
-            retVal = "";
+            retValFor = "";
         for (var i = 0, n = charset.length; i < this.state.charLength; ++i) {
-            retVal += charset.charAt(Math.floor(Math.random() * n));
+            retValFor += charset.charAt(Math.floor(Math.random() * n));
         }
-        alert(retVal);
+        this.setState({retVal: retValFor })
     }
 
     renderItem = ({ item }) => {
@@ -210,54 +231,27 @@ export default class Main extends React.Component {
                             </Item>
                         </Form>
 
+                        <Button onPress={() => this.generatePassword()}>
+                            <Text>ŞİFRE OLUŞTUR</Text>
+                        </Button>
 
-                        <Button warning
+                        <Text>{this.state.retVal}</Text>
+
+                        <Button iconLeft
                             onPress={() =>
                                 Toast.show({
-                                    text: "Wrong password!",
-                                    buttonText: "Okay",
-                                    type: "warning"
-                                })}
-                        >
-                            <Text>Warning Toast</Text>
+                                    text: "Şifre Kayıt Edildi!",
+                                    buttonText: "Tamam",
+                                    type: "success"
+                                })}>
+                            <Icon name='copy' />
+                            <Text>Kopyala</Text>
                         </Button>
-                        <Button danger
-                            onPress={() =>
-                                Toast.show({
-                                    text: "Wrong password!",
-                                    buttonText: "Okay",
-                                    type: "danger"
-                                })}
-                        >
-                            <Text>Danger Toast</Text>
-                        </Button>
+
                     </Content>
                 </Container>
             </Root>
         );
-    }
-
-    onButtonPress = () => {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
-        // then navigate
-        navigate('NewScreen');
-    }
-
-    handleBackButton = () => {
-        Alert.alert(
-            'Uygulamadan Çık',
-            'Uygulamadan çıkılsın mı?', [{
-                text: 'Hayır',
-                onPress: () => console.log('Hayır Basıldı!'),
-                style: 'cancel'
-            }, {
-                text: 'Evet',
-                onPress: () => BackHandler.exitApp()
-            },], {
-            cancelable: false
-        }
-        )
-        return true;
     }
 
     render() {
