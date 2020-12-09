@@ -9,6 +9,7 @@ import Welcome from './src/screens/Welcome';
 import Login from './src/screens/Login';
 import Signup from './src/screens/Signup';
 import Main from './src/screens/Main';
+import uti from './src/screens/Utilities';
 
 const Stack = createStackNavigator();
 

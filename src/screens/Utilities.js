@@ -1,14 +1,20 @@
-import { Clipboard } from '@react-native-community/clipboard';
+import React, { useState } from 'react';
+import { Button, Overlay } from 'react-native-elements';
 
-const readFromClipboard = async () => {
-  const clipboardContent = await Clipboard.getString();
-  return clipboardContent;
+const OverlayExample = () => {
+  const [visible, setVisible] = useState(false);
+
+  const toggleOverlay = () => {
+    setVisible(!visible);
+  };
+
+  return (
+    <View>
+      <Button title="Open Overlay" onPress={toggleOverlay} />
+
+      <Overlay isVisible={visible} onBackdropPress={toggleOverlay}>
+        <Text>Hello from Overlay!</Text>
+      </Overlay>
+    </View>
+  );
 };
-
-const writeToClipboard = async (text) => {
-  alert('İçinde !');
-  await Clipboard.setString(text);
-  alert('Kopyalandi !');
-};
-
-export { writeToClipboard, readFromClipboard };

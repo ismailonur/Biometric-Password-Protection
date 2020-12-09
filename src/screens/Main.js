@@ -1,6 +1,5 @@
-
-import * as React from 'react';
-import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet } from 'react-native'
+import React, { Component, useState } from 'react';
+import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableHighlight } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ListItem } from 'react-native-elements';
@@ -9,6 +8,7 @@ import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import { writeToClipboard } from './Utilities';
 import Clipboard from '@react-native-community/clipboard';
+import { Overlay } from 'react-native-elements';
 
 const Tab = createBottomTabNavigator();
 
@@ -59,7 +59,7 @@ const list = [
     },
 ]
 
-export default class Main extends React.Component {
+class Main extends Component {
 
     state = {
         name: "",
@@ -70,7 +70,14 @@ export default class Main extends React.Component {
         allPassword: [],
         firebaseControl: false,
         showToast: false,
-        retVal: ""
+        retVal: "Şifre",
+        modalVisible: false,
+        bioName: '',
+        bioPassword: ''
+    }
+
+    setModalVisible = (visible, name, password) => {
+        this.setState({ modalVisible: visible, bioName: name, bioPassword: password });
     }
 
     async componentDidMount() {
@@ -113,6 +120,9 @@ export default class Main extends React.Component {
         if (nextState.retVal !== this.state.retVal) {
             return true
         }
+        if (nextState.modalVisible !== this.state.modalVisible) {
+            return true
+        }
         return nextProps !== this.props && nextState !== this.state;
     }
 
@@ -131,28 +141,71 @@ export default class Main extends React.Component {
         this.setState({ retVal: retValFor })
     }
 
+    Model() {
+        const { modalVisible } = this.state;
+        //this.setModalVisible(true)
+
+        if (modalVisible === true) {
+            return (
+                <View>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={modalVisible}
+                        onRequestClose={() => {
+                            Alert.alert("Modal has been closed.");
+                        }}
+                    >
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <Text style={styles.modalText}>{this.state.bioName}</Text>
+                                <Text style={styles.modalText}>{this.state.bioPassword}</Text>
+
+                                <TouchableHighlight
+                                    style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
+                                    onPress={() => {
+                                        this.setModalVisible(!modalVisible);
+                                    }}
+                                >
+                                    <Text style={styles.textStyle}>        Tamam        </Text>
+                                </TouchableHighlight>
+                            </View>
+                        </View>
+                    </Modal>
+                </View>
+            )
+        }
+    }
+
     renderItem = ({ item }) => {
         return (
-            <TouchableOpacity onPress={() => alert(item.name)} >
-                <ListItem bottomDivider>
-                    <ListItem.Content>
-                        <ListItem.Title>{item.name}</ListItem.Title>
-                        <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
-                    </ListItem.Content>
-                    <ListItem.Chevron />
-                </ListItem>
-            </TouchableOpacity>
+            <View>
+                <TouchableOpacity onPress={() => this.setModalVisible(true, item.name, item.subtitle)} >
+                    <ListItem bottomDivider>
+                        <ListItem.Content>
+                            <ListItem.Title>{item.name}</ListItem.Title>
+                            <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
+                        </ListItem.Content>
+                        <ListItem.Chevron />
+                    </ListItem>
+                </TouchableOpacity>
+            </View>
         )
     }
 
     Passwords() {
         if (this.state.firebaseControl === true) {
             return (
-                <FlatList
-                    keyExtractor={(item, index) => index.toString()}
-                    data={this.state.allPassword}
-                    renderItem={this.renderItem}
-                />
+                <View>
+                    <FlatList
+                        keyExtractor={(item, index) => index.toString()}
+                        data={this.state.allPassword}
+                        renderItem={this.renderItem}
+                    />
+                    {
+                        this.Model()
+                    }
+                </View>
             );
         } else {
             return <Text>Yükleniyor...</Text>
@@ -330,5 +383,45 @@ const styles = StyleSheet.create({
     newPassText: {
         color: '#fff',
         textAlign: 'center'
+    },
+
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5
+    },
+    openButton: {
+        backgroundColor: "#F194FF",
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2
+    },
+    textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: "center"
     }
-})
+
+});
+
+export default Main;
