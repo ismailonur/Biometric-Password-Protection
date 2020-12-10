@@ -65,13 +65,11 @@ function App() {
             },
           }}
         >
-
           {checkUser()}
 
           <Stack.Screen name="Main" component={Main} options={{ title: 'Biyometrik Koruma', headerLeft: false }} />
           <Stack.Screen name="Login" component={Login} options={{ title: 'Giriş Yap' }} />
           <Stack.Screen name="Signup" component={Signup} options={{ title: 'Kayıt Ol' }} />
-
 
         </Stack.Navigator>
       </NavigationContainer>

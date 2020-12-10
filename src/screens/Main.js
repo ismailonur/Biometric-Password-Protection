@@ -277,9 +277,9 @@ class Main extends Component {
 
     AddPassword() {
         return (
-            <Container style={styles.addPassword}>
-                <Content>
-                    <Form>
+            <Container style={styles.container}>
+                <Content style={styles.addPassword}>
+                    <Form >
                         <Item floatingLabel>
                             <Label>Hesap</Label>
                             <Input
@@ -427,8 +427,8 @@ const styles = StyleSheet.create({
     addPassword: {
         flex: 1,
         backgroundColor: '#242424',
-        paddingVertical: 150,
-        paddingHorizontal: 50
+        paddingTop: 150,
+        paddingHorizontal: 30
     },
 
     yukleniyorView: {
