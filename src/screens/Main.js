@@ -215,7 +215,7 @@ class Main extends Component {
                     <ListItem bottomDivider containerStyle={styles.renderItem}>
                         <ListItem.Content>
                             <ListItem.Title style={{ color: '#fff' }}>{item.name}</ListItem.Title>
-                            <ListItem.Subtitle style={{ color: '#fff' }}>***************</ListItem.Subtitle>
+                            <ListItem.Subtitle style={{ color: 'gray' }}>***************</ListItem.Subtitle>
                         </ListItem.Content>
                         <ListItem.Chevron />
                     </ListItem>
@@ -401,9 +401,11 @@ class Main extends Component {
                 tabBarOptions={{
                     activeTintColor: 'red',
                     inactiveTintColor: 'gray',
+                    activeBackgroundColor: '#1b1b1b',
+                    inactiveBackgroundColor: '#1b1b1b'
                 }}
             >
-                <Tab.Screen name="Şifreler" component={this.Passwords.bind(this)} />
+                <Tab.Screen name="Şifreler" component={this.Passwords.bind(this)}/>
                 <Tab.Screen name="Şifre Ekle" component={this.AddPassword.bind(this)} />
                 <Tab.Screen name="Şifre Oluştur" component={this.CreatePassword.bind(this)} />
             </Tab.Navigator>
