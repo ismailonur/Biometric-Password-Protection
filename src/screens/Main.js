@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableHighlight } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -13,53 +13,6 @@ let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
 
 const Tab = createBottomTabNavigator();
-
-const list = [
-    {
-        name: 'Instagram',
-        subtitle: '***************'
-    },
-    {
-        name: 'Facebook',
-        subtitle: '***************'
-    },
-    {
-        name: 'Email',
-        subtitle: '***************'
-    },
-    {
-        name: 'Github',
-        subtitle: '***************'
-    },
-    {
-        name: 'Linkedin',
-        subtitle: '***************'
-    },
-    {
-        name: 'TWAS',
-        subtitle: '***************'
-    },
-    {
-        name: 'Reddit',
-        subtitle: '***************'
-    },
-    {
-        name: 'Medium',
-        subtitle: '***************'
-    },
-    {
-        name: 'WordPress',
-        subtitle: '***************'
-    },
-    {
-        name: 'Pinterest',
-        subtitle: '***************'
-    },
-    {
-        name: 'Twitter',
-        subtitle: '***************'
-    },
-]
 
 class Main extends Component {
 
@@ -77,7 +30,7 @@ class Main extends Component {
         text: '',
         allPassword: [],
         firebaseControl: false,
-        retVal: "Güçlü Şifre Burada Görünür!",
+        retVal: "",
         modalVisible: false,
         bioName: '',
         bioPassword: '',
@@ -95,8 +48,6 @@ class Main extends Component {
 
     onButtonPress = () => {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
-        // then navigate
-        navigate('NewScreen');
     }
 
     handleBackButton = () => {
@@ -116,7 +67,6 @@ class Main extends Component {
         return true;
     }
 
-    // From the RN documentation
     shouldComponentUpdate(nextProps, nextState) {
         if (nextState.allPassword !== this.state.allPassword) {
             return true
@@ -153,7 +103,6 @@ class Main extends Component {
     }
 
     async RemovingData(removeName) {
-        //alert(removeName)
         await database()
             .ref(`PASS/${auth().currentUser.uid}/${removeName}`)
             .remove();
@@ -227,7 +176,7 @@ class Main extends Component {
 
     renderItem = ({ item }) => {
         return (
-            <View >
+            <View>
                 <TouchableOpacity onPress={() => this.setModalVisible(true, item.name, item.subtitle)} >
                     <ListItem bottomDivider containerStyle={styles.renderItem}>
                         <ListItem.Content>
@@ -266,7 +215,6 @@ class Main extends Component {
     }
 
     AddFirebase() {
-        alert('firebase')
         const { name, password } = this.state
         database().ref(`PASS/${auth().currentUser.uid}/${name}`).set({
             name: name,
@@ -301,7 +249,14 @@ class Main extends Component {
                         </Item>
                     </Form>
                     <Button light block style={styles.loginButton}
-                        onPress={() => this.AddFirebase()}>
+                        onPress={() => {
+                            this.AddFirebase();
+                            Toast.show({
+                                text: "Şifre Kayıt Edildi!",
+                                buttonText: "Tamam",
+                                type: "success"
+                            })
+                        }}>
                         <Text style={styles.buttonText}>        ŞİFRE'Yİ KAYDET        </Text>
                     </Button>
                 </Content>
@@ -321,7 +276,6 @@ class Main extends Component {
                                 maxLength={2}
                                 textAlign='center'
                                 keyboardType='number-pad'
-                                //value={this.state.charLength}
                                 onChangeText={text => this.setState({ charLength: text })}
                             />
                         </Item>
@@ -358,31 +312,27 @@ class Main extends Component {
     }
 
     render() {
-
         if (this.state.modalVisible === true) {
+            ReactNativeBiometrics.createKeys('Confirm fingerprint')
+                .then((resultObject) => {
+                    const { publicKey } = resultObject
+                    //alert(publicKey)
+                })
 
-            this.setState({ bioModalVisible: true })
+            ReactNativeBiometrics.createSignature({
+                promptMessage: 'Parmak İzi Doğrula',
+                payload: payload
+            })
+                .then((resultObject) => {
+                    const { success, signature } = resultObject
 
-            // ReactNativeBiometrics.createKeys('Confirm fingerprint')
-            //     .then((resultObject) => {
-            //         const { publicKey } = resultObject
-            //         //alert(publicKey)
-            //     })
-
-            // ReactNativeBiometrics.createSignature({
-            //     promptMessage: 'Parmak İzi Doğrula',
-            //     payload: payload
-            // })
-            //     .then((resultObject) => {
-            //         const { success, signature } = resultObject
-
-            //         if (success) {
-            //             this.setState({ bioModalVisible: true })
-            //         }
-            //         else {
-            //             alert("Parmak İzi Doğrulanamadı!")
-            //         }
-            //     }) 
+                    if (success) {
+                        this.setState({ bioModalVisible: true })
+                    }
+                    else {
+                        alert("Parmak İzi Doğrulanamadı!")
+                    }
+                }) 
         }
 
         return (
@@ -461,6 +411,7 @@ const styles = StyleSheet.create({
     },
 
     loginButton: {
+        backgroundColor: '#808080',
         justifyContent: 'center',
         alignSelf: 'center',
         marginVertical: 80,
@@ -468,6 +419,7 @@ const styles = StyleSheet.create({
     },
 
     copyButton: {
+        backgroundColor: '#808080',
         justifyContent: 'center',
         alignSelf: 'center',
         marginVertical: 20,

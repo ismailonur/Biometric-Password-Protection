@@ -13,12 +13,12 @@ export default class Welcome extends Component {
                 <View>
                     <Button bordered rounded block danger style={styles.button}
                         onPress={() => this.props.navigation.navigate("Login")}>
-                        <Text>GİRİŞ YAP</Text>
+                        <Text style={styles.buttontext}>GİRİŞ YAP</Text>
                     </Button>
 
                     <Button bordered rounded block danger style={styles.button}
                         onPress={() => this.props.navigation.navigate("Signup")}>
-                        <Text>KAYIT OL</Text>
+                        <Text style={styles.buttontext}>KAYIT OL</Text>
                     </Button>
                 </View>
             </View>
@@ -53,6 +53,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',
         marginVertical: 10,
-        marginHorizontal: 100
+        marginHorizontal: 100,
+        borderBottomWidth: 3
+    },
+
+    buttontext: {
+        fontWeight: "bold",
+        fontSize: 15
     }
 })

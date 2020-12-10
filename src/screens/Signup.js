@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { StyleSheet } from 'react-native'
-import { Container, Content, Form, Item, Input, Label, Button, Text, View } from 'native-base';
+import { Container, Content, Form, Item, Input, Label, Button, Text, Toast } from 'native-base';
 import auth from '@react-native-firebase/auth';
 
 export default class Signup extends Component {
@@ -14,33 +14,6 @@ export default class Signup extends Component {
         confirm: null
     }
 
-    async CodeConfirm() {
-        alert(auth().currentUser.email)
-        const { verificationId, code } = this.state
-        try {
-            alert(auth().currentUser.email)
-            const credential = auth.PhoneAuthProvider.credential(
-                verificationId,
-                code,
-            );
-            let userData = await auth().currentUser.linkWithCredential(credential);
-            alert(userData.user);
-        } catch (error) {
-            if (error.code == 'auth/invalid-verification-code') {
-                alert('Invalid code.');
-            } else {
-                //alert('Account linking error');
-                alert(error)
-            }
-        }
-    }
-
-    async GoPhone() {
-        const confirmation = await auth().verifyPhoneNumber('+90 543-386-9448');
-        console.log(confirmation);
-        this.setState({ confirm: confirmation.verificationId })
-    }
-
     GoSignup() {
         const { email, password, againPassword } = this.state
 
@@ -48,23 +21,37 @@ export default class Signup extends Component {
             auth()
                 .createUserWithEmailAndPassword(email, password)
                 .then(async () => {
-                    alert('Kullanıcı Oluşturuldu & Giriş Yapılıyor!');
+                    Toast.show({
+                        text: "Kullanıcı Oluşturuldu & Giriş Yapılıyor!",
+                        buttonText: "Tamam",
+                        type: "success"
+                    })
                     this.props.navigation.navigate("Main")
                 })
                 .catch(error => {
                     if (error.code === 'auth/email-already-in-use') {
-                        alert('Girilen e-posta adresi sistemde kayıtlı!');
+                        Toast.show({
+                            text: "Girilen Email Sistemde Kayıtlı!",
+                            buttonText: "Tamam",
+                            type: "warning"
+                        })
                     }
 
                     if (error.code === 'auth/invalid-email') {
-                        alert('Bu e-posta adresi geçersiz!');
+                        Toast.show({
+                            text: "Bu Email Geçersiz!",
+                            buttonText: "Tamam",
+                            type: "warning"
+                        })
                     }
-
-                    alert(error);
                 });
         }
         else {
-            alert("Girilen şifreler Uyuşmuyor!");
+            Toast.show({
+                text: "Girilen Şifreler Uyuşmuyor!",
+                buttonText: "Tamam",
+                type: "warning"
+            })
         }
     }
 
@@ -76,6 +63,7 @@ export default class Signup extends Component {
                         <Item floatingLabel>
                             <Label>Email</Label>
                             <Input
+                                style={styles.textInputText}
                                 autoCompleteType='email'
                                 keyboardType='email-address'
                                 textContentType='emailAddress'
@@ -84,6 +72,7 @@ export default class Signup extends Component {
                         <Item floatingLabel>
                             <Label>Phone Number</Label>
                             <Input
+                                style={styles.textInputText}
                                 autoCompleteType='tel'
                                 keyboardType='phone-pad'
                                 textContentType='telephoneNumber'
@@ -92,6 +81,7 @@ export default class Signup extends Component {
                         <Item floatingLabel>
                             <Label>Password</Label>
                             <Input
+                                style={styles.textInputText}
                                 autoCompleteType='password'
                                 keyboardType='visible-password'
                                 textContentType='password'
@@ -100,25 +90,16 @@ export default class Signup extends Component {
                         <Item floatingLabel>
                             <Label>Again Password</Label>
                             <Input
+                                style={styles.textInputText}
                                 autoCompleteType='password'
                                 keyboardType='visible-password'
                                 textContentType='password'
                                 onChangeText={(text) => this.setState({ againPassword: text })} />
                         </Item>
-                        <Item floatingLabel>
-                            <Label>Code</Label>
-                            <Input
-                                keyboardType='number-pad'
-                                onChangeText={(text) => this.setState({ code: text })} />
-                        </Item>
                     </Form>
                     <Button light block rounded style={styles.signupButton}
                         onPress={() => this.GoSignup()}>
-                        <Text>KAYIT OL</Text>
-                    </Button>
-                    <Button light block rounded style={styles.signupButton}
-                        onPress={() => this.CodeConfirm()}>
-                        <Text>Code Confirm</Text>
+                        <Text style={styles.kayitOlText}>KAYIT OL</Text>
                     </Button>
                 </Content>
             </Container>
@@ -135,9 +116,20 @@ const styles = StyleSheet.create({
     },
 
     signupButton: {
+        backgroundColor: '#808080',
         justifyContent: 'center',
         alignSelf: 'center',
         marginVertical: 80,
-        marginHorizontal: 50
+        marginHorizontal: 80
+    },
+
+    textInputText: {
+        color: '#fff'
+    },
+
+    kayitOlText:{
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 15
     }
 })

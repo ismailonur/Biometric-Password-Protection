@@ -7,28 +7,25 @@ let payload = epochTimeSeconds + 'some message'
 
 export default class BiometricControl extends Component {
     render() {
+        ReactNativeBiometrics.createKeys('Confirm fingerprint')
+            .then((resultObject) => {
+                const { publicKey } = resultObject
+            })
 
-        this.props.navigation.navigate("Main")
+        ReactNativeBiometrics.createSignature({
+            promptMessage: 'Sign in',
+            payload: payload
+        })
+            .then((resultObject) => {
+                const { success, signature } = resultObject
 
-        // ReactNativeBiometrics.createKeys('Confirm fingerprint')
-        //     .then((resultObject) => {
-        //         const { publicKey } = resultObject
-        //     })
-
-        // ReactNativeBiometrics.createSignature({
-        //     promptMessage: 'Sign in',
-        //     payload: payload
-        // })
-        //     .then((resultObject) => {
-        //         const { success, signature } = resultObject
-
-        //         if (success) {
-        //             this.props.navigation.navigate("Main")
-        //         }
-        //         else{
-        //             alert("Giriş Sağlanamadı!")
-        //         }
-        //     })
+                if (success) {
+                    this.props.navigation.navigate("Main")
+                }
+                else{
+                    alert("Giriş Sağlanamadı!")
+                }
+            })
          return (
              <View style={styles.container}>
                  <Text style={styles.text}>Biyometrik Kontrol Sağlanıyor!</Text>
