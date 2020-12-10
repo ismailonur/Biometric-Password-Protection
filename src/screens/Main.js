@@ -154,44 +154,71 @@ class Main extends Component {
 
         if (bioModalVisible === true) {
             return (
-                <View>
-                    <Modal
-                        animationType="slide"
-                        transparent={true}
-                        visible={bioModalVisible}
-                        onRequestClose={() => {
-                            Alert.alert("Modal has been closed.");
-                        }}
-                    >
-                        <View style={styles.centeredView}>
-                            <View style={styles.modalView}>
-                                <Text style={styles.modalText}>{this.state.bioName}</Text>
-                                <Text style={styles.modalText}>{this.state.bioPassword}</Text>
+                <Root>
+                    <Container style={styles.container}>
+                        <Content padder>
+                            <Modal
+                                animationType="slide"
+                                transparent={true}
+                                visible={bioModalVisible}
+                                onRequestClose={() => {
+                                    Alert.alert("Modal has been closed.");
+                                }}
+                            >
+                                <View style={styles.centeredView}>
+                                    <View style={styles.modalView}>
+                                        <Text style={styles.modalText}>{this.state.bioName}</Text>
+                                        <Text style={styles.modalText}>{this.state.bioPassword}</Text>
 
-                                <TouchableHighlight
-                                    style={{ ...styles.openButton, backgroundColor: "#2196F3" }}
-                                    onPress={() => {
-                                        this.setState({ bioModalVisible: false, modalVisible: false });
-                                    }}
-                                >
-                                    <Text style={styles.textStyle}>        Tamam        </Text>
-                                </TouchableHighlight>
-                            </View>
-                        </View>
-                    </Modal>
-                </View>
+                                        <TouchableHighlight
+                                            style={{ ...styles.openButton, backgroundColor: "#2196F3", marginTop: 10 }}
+                                            onPress={() => {
+                                                this.setState({ bioModalVisible: false, modalVisible: false });
+                                            }}
+                                        >
+                                            <Text style={styles.textStyle}>        Tamam        </Text>
+                                        </TouchableHighlight>
+                                        <TouchableHighlight
+                                            style={{ ...styles.openButton, backgroundColor: "green", margin:20 }}
+                                            onPress={() => {
+                                                //this.setState({ bioModalVisible: false, modalVisible: false });
+                                                Clipboard.setString(this.state.bioPassword);
+                                                Toast.show({
+                                                    text: "Şifre Kopyalandı!",
+                                                    buttonText: "Tamam",
+                                                    type: "success",
+                                                    position: "bottom"
+                                                })
+                                            }}
+                                        >
+                                            <Text style={styles.textStyle}>        Kopyala        </Text>
+                                        </TouchableHighlight>
+                                        <TouchableHighlight
+                                            style={{ ...styles.openButton, backgroundColor: "red" }}
+                                            onPress={() => {
+                                                this.setState({ bioModalVisible: false, modalVisible: false });
+                                            }}
+                                        >
+                                            <Text style={styles.textStyle}>        Sil        </Text>
+                                        </TouchableHighlight>
+                                    </View>
+                                </View>
+                            </Modal>
+                        </Content>
+                    </Container>
+                </Root>
             )
         }
     }
 
     renderItem = ({ item }) => {
         return (
-            <View>
+            <View >
                 <TouchableOpacity onPress={() => this.setModalVisible(true, item.name, item.subtitle)} >
-                    <ListItem bottomDivider>
+                    <ListItem bottomDivider containerStyle={styles.renderItem}>
                         <ListItem.Content>
-                            <ListItem.Title>{item.name}</ListItem.Title>
-                            <ListItem.Subtitle>***************</ListItem.Subtitle>
+                            <ListItem.Title style={{ color: '#fff'}}>{item.name}</ListItem.Title>
+                            <ListItem.Subtitle style={{ color: '#fff'}}>***************</ListItem.Subtitle>
                         </ListItem.Content>
                         <ListItem.Chevron />
                     </ListItem>
@@ -203,7 +230,7 @@ class Main extends Component {
     Passwords() {
         if (this.state.firebaseControl === true) {
             return (
-                <View>
+                <View style={styles.container}>
                     <FlatList
                         keyExtractor={(item, index) => index.toString()}
                         data={this.state.allPassword}
@@ -236,7 +263,7 @@ class Main extends Component {
 
     AddPassword() {
         return (
-            <Container >
+            <Container>
                 <Content style={styles.container}>
                     <Form>
                         <Item floatingLabel>
@@ -325,26 +352,29 @@ class Main extends Component {
     render() {
 
         if (this.state.modalVisible === true) {
-            ReactNativeBiometrics.createKeys('Confirm fingerprint')
-                .then((resultObject) => {
-                    const { publicKey } = resultObject
-                    //alert(publicKey)
-                })
 
-            ReactNativeBiometrics.createSignature({
-                promptMessage: 'Parmak İzi Doğrula',
-                payload: payload
-            })
-                .then((resultObject) => {
-                    const { success, signature } = resultObject
+            this.setState({ bioModalVisible: true })
 
-                    if (success) {
-                        this.setState({ bioModalVisible: true })
-                    }
-                    else {
-                        alert("Parmak İzi Doğrulanamadı!")
-                    }
-                })
+            // ReactNativeBiometrics.createKeys('Confirm fingerprint')
+            //     .then((resultObject) => {
+            //         const { publicKey } = resultObject
+            //         //alert(publicKey)
+            //     })
+
+            // ReactNativeBiometrics.createSignature({
+            //     promptMessage: 'Parmak İzi Doğrula',
+            //     payload: payload
+            // })
+            //     .then((resultObject) => {
+            //         const { success, signature } = resultObject
+
+            //         if (success) {
+            //             this.setState({ bioModalVisible: true })
+            //         }
+            //         else {
+            //             alert("Parmak İzi Doğrulanamadı!")
+            //         }
+            //     })
         }
 
         return (
@@ -385,7 +415,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1b1b1b',
-        paddingVertical: 130
+        //paddingVertical: 130
+    },
+
+    renderItem:{
+        flex:1,
+        backgroundColor: '#1b1b1b',
     },
 
     createPassword: {

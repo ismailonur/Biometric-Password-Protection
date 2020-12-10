@@ -7,6 +7,9 @@ let payload = epochTimeSeconds + 'some message'
 
 export default class BiometricControl extends Component {
     render() {
+
+        this.props.navigation.navigate("Main")
+        
         ReactNativeBiometrics.createKeys('Confirm fingerprint')
             .then((resultObject) => {
                 const { publicKey } = resultObject
