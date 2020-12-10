@@ -3,7 +3,7 @@ import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet, Modal
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ListItem } from 'react-native-elements';
-import { Root, Container, Content, Form, Item, Input, Label, Button, Text, Toast, Icon } from 'native-base';
+import { Root, Container, Content, Form, Item, Input, Label, Button, Text, Toast, Icon, Spinner } from 'native-base';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import Clipboard from '@react-native-community/clipboard';
@@ -155,57 +155,54 @@ class Main extends Component {
         if (bioModalVisible === true) {
             return (
                 <Root>
-                    <Container style={styles.container}>
-                        <Content padder>
-                            <Modal
-                                animationType="slide"
-                                transparent={true}
-                                visible={bioModalVisible}
-                                onRequestClose={() => {
-                                    Alert.alert("Modal has been closed.");
-                                }}
-                            >
-                                <View style={styles.centeredView}>
-                                    <View style={styles.modalView}>
-                                        <Text style={styles.modalText}>{this.state.bioName}</Text>
-                                        <Text style={styles.modalText}>{this.state.bioPassword}</Text>
 
-                                        <TouchableHighlight
-                                            style={{ ...styles.openButton, backgroundColor: "#2196F3", marginTop: 10 }}
-                                            onPress={() => {
-                                                this.setState({ bioModalVisible: false, modalVisible: false });
-                                            }}
-                                        >
-                                            <Text style={styles.textStyle}>        Tamam        </Text>
-                                        </TouchableHighlight>
-                                        <TouchableHighlight
-                                            style={{ ...styles.openButton, backgroundColor: "green", margin:20 }}
-                                            onPress={() => {
-                                                //this.setState({ bioModalVisible: false, modalVisible: false });
-                                                Clipboard.setString(this.state.bioPassword);
-                                                Toast.show({
-                                                    text: "Şifre Kopyalandı!",
-                                                    buttonText: "Tamam",
-                                                    type: "success",
-                                                    position: "bottom"
-                                                })
-                                            }}
-                                        >
-                                            <Text style={styles.textStyle}>        Kopyala        </Text>
-                                        </TouchableHighlight>
-                                        <TouchableHighlight
-                                            style={{ ...styles.openButton, backgroundColor: "red" }}
-                                            onPress={() => {
-                                                this.setState({ bioModalVisible: false, modalVisible: false });
-                                            }}
-                                        >
-                                            <Text style={styles.textStyle}>        Sil        </Text>
-                                        </TouchableHighlight>
-                                    </View>
-                                </View>
-                            </Modal>
-                        </Content>
-                    </Container>
+                    <Modal
+                        animationType="slide"
+                        transparent={true}
+                        visible={bioModalVisible}
+                        onRequestClose={() => {
+                            Alert.alert("Modal has been closed.");
+                        }}
+                    >
+                        <View style={styles.centeredView}>
+                            <View style={styles.modalView}>
+                                <Text style={styles.modalText}>{this.state.bioName}</Text>
+                                <Text style={styles.modalText}>{this.state.bioPassword}</Text>
+
+                                <TouchableHighlight
+                                    style={{ ...styles.openButton, backgroundColor: "#2196F3", marginTop: 10 }}
+                                    onPress={() => {
+                                        this.setState({ bioModalVisible: false, modalVisible: false });
+                                    }}
+                                >
+                                    <Text style={styles.textStyle}>        Tamam        </Text>
+                                </TouchableHighlight>
+
+                                <TouchableHighlight
+                                    style={{ ...styles.openButton, backgroundColor: "green", margin: 20 }}
+                                    onPress={() => {
+                                        Clipboard.setString(this.state.bioPassword);
+                                        Toast.show({
+                                            text: "Şifre Kopyalandı!",
+                                            buttonText: "Tamam",
+                                            type: "success",
+                                        })
+                                    }}
+                                >
+                                    <Text style={styles.textStyle}>        Kopyala        </Text>
+                                </TouchableHighlight>
+
+                                <TouchableHighlight
+                                    style={{ ...styles.openButton, backgroundColor: "red" }}
+                                    onPress={() => {
+                                        this.setState({ bioModalVisible: false, modalVisible: false });
+                                    }}
+                                >
+                                    <Text style={styles.textStyle}>        Sil        </Text>
+                                </TouchableHighlight>
+                            </View>
+                        </View>
+                    </Modal>
                 </Root>
             )
         }
@@ -217,8 +214,8 @@ class Main extends Component {
                 <TouchableOpacity onPress={() => this.setModalVisible(true, item.name, item.subtitle)} >
                     <ListItem bottomDivider containerStyle={styles.renderItem}>
                         <ListItem.Content>
-                            <ListItem.Title style={{ color: '#fff'}}>{item.name}</ListItem.Title>
-                            <ListItem.Subtitle style={{ color: '#fff'}}>***************</ListItem.Subtitle>
+                            <ListItem.Title style={{ color: '#fff' }}>{item.name}</ListItem.Title>
+                            <ListItem.Subtitle style={{ color: '#fff' }}>***************</ListItem.Subtitle>
                         </ListItem.Content>
                         <ListItem.Chevron />
                     </ListItem>
@@ -242,7 +239,12 @@ class Main extends Component {
                 </View>
             );
         } else {
-            return <Text>Yükleniyor...</Text>
+            return (
+                <View style={styles.yukleniyorView}>
+                    <Spinner color='red' />
+                    <Text style={styles.yukleniyorText}>Yükleniyor...</Text>
+                </View>
+            )
         }
     }
 
@@ -414,12 +416,25 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#1b1b1b',
+        backgroundColor: '#242424',
         //paddingVertical: 130
     },
 
-    renderItem:{
-        flex:1,
+    yukleniyorView: {
+        flex: 1,
+        backgroundColor: '#242424',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    yukleniyorText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 24
+    },
+
+    renderItem: {
+        flex: 1,
         backgroundColor: '#1b1b1b',
     },
 
