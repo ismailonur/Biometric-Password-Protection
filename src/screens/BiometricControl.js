@@ -9,31 +9,31 @@ export default class BiometricControl extends Component {
     render() {
 
         this.props.navigation.navigate("Main")
-        
-        ReactNativeBiometrics.createKeys('Confirm fingerprint')
-            .then((resultObject) => {
-                const { publicKey } = resultObject
-            })
 
-        ReactNativeBiometrics.createSignature({
-            promptMessage: 'Sign in',
-            payload: payload
-        })
-            .then((resultObject) => {
-                const { success, signature } = resultObject
+        // ReactNativeBiometrics.createKeys('Confirm fingerprint')
+        //     .then((resultObject) => {
+        //         const { publicKey } = resultObject
+        //     })
 
-                if (success) {
-                    this.props.navigation.navigate("Main")
-                }
-                else{
-                    alert("Giriş Sağlanamadı!")
-                }
-            })
-        return (
-            <View style={styles.container}>
-                <Text style={styles.text}>Biyometrik Kontrol Sağlanıyor!</Text>
-            </View>
-        )
+        // ReactNativeBiometrics.createSignature({
+        //     promptMessage: 'Sign in',
+        //     payload: payload
+        // })
+        //     .then((resultObject) => {
+        //         const { success, signature } = resultObject
+
+        //         if (success) {
+        //             this.props.navigation.navigate("Main")
+        //         }
+        //         else{
+        //             alert("Giriş Sağlanamadı!")
+        //         }
+        //     })
+         return (
+             <View style={styles.container}>
+                 <Text style={styles.text}>Biyometrik Kontrol Sağlanıyor!</Text>
+             </View>
+         )
     }
 }
 

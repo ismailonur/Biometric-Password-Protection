@@ -63,6 +63,13 @@ const list = [
 
 class Main extends Component {
 
+    constructor(props) {
+        super(props);
+        this.state = {
+            showToast: false
+        };
+    }
+
     state = {
         name: "",
         password: "",
@@ -71,7 +78,6 @@ class Main extends Component {
         text: '',
         allPassword: [],
         firebaseControl: false,
-        showToast: false,
         retVal: "Şifre",
         modalVisible: false,
         bioName: '',
@@ -147,6 +153,14 @@ class Main extends Component {
         this.setState({ retVal: retValFor })
     }
 
+    async RemovingData(removeName) {
+        //alert(removeName)
+        await database()
+            .ref(`PASS/${auth().currentUser.uid}/${removeName}`)
+            .remove();
+        this.LoadingPassword()
+    }
+
     Modal() {
         const { bioModalVisible, modalVisible } = this.state;
 
@@ -154,56 +168,60 @@ class Main extends Component {
 
         if (bioModalVisible === true) {
             return (
-                <Root>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={bioModalVisible}
+                    onRequestClose={() => {
+                        Alert.alert("Modal has been closed.");
+                    }}
+                >
+                    <View style={styles.centeredView}>
+                        <View style={styles.modalView}>
+                            <Text style={styles.modalText}>{this.state.bioName}</Text>
+                            <Text style={styles.modalText}>{this.state.bioPassword}</Text>
 
-                    <Modal
-                        animationType="slide"
-                        transparent={true}
-                        visible={bioModalVisible}
-                        onRequestClose={() => {
-                            Alert.alert("Modal has been closed.");
-                        }}
-                    >
-                        <View style={styles.centeredView}>
-                            <View style={styles.modalView}>
-                                <Text style={styles.modalText}>{this.state.bioName}</Text>
-                                <Text style={styles.modalText}>{this.state.bioPassword}</Text>
+                            <TouchableHighlight
+                                style={{ ...styles.openButton, backgroundColor: "#2196F3", marginTop: 10 }}
+                                onPress={() => {
+                                    this.setState({ bioModalVisible: false, modalVisible: false });
+                                }}
+                            >
+                                <Text style={styles.textStyle}>        Tamam        </Text>
+                            </TouchableHighlight>
 
-                                <TouchableHighlight
-                                    style={{ ...styles.openButton, backgroundColor: "#2196F3", marginTop: 10 }}
-                                    onPress={() => {
-                                        this.setState({ bioModalVisible: false, modalVisible: false });
-                                    }}
-                                >
-                                    <Text style={styles.textStyle}>        Tamam        </Text>
-                                </TouchableHighlight>
+                            <TouchableHighlight
+                                style={{ ...styles.openButton, backgroundColor: "green", margin: 20 }}
+                                onPress={() => {
+                                    Clipboard.setString(this.state.bioPassword);
+                                    Toast.show({
+                                        text: "Şifre Kopyalandı!",
+                                        buttonText: "Tamam",
+                                        type: "success",
+                                    });
+                                    this.setState({ bioModalVisible: false, modalVisible: false });
+                                }}
+                            >
+                                <Text style={styles.textStyle}>        Kopyala        </Text>
+                            </TouchableHighlight>
 
-                                <TouchableHighlight
-                                    style={{ ...styles.openButton, backgroundColor: "green", margin: 20 }}
-                                    onPress={() => {
-                                        Clipboard.setString(this.state.bioPassword);
-                                        Toast.show({
-                                            text: "Şifre Kopyalandı!",
-                                            buttonText: "Tamam",
-                                            type: "success",
-                                        })
-                                    }}
-                                >
-                                    <Text style={styles.textStyle}>        Kopyala        </Text>
-                                </TouchableHighlight>
-
-                                <TouchableHighlight
-                                    style={{ ...styles.openButton, backgroundColor: "red" }}
-                                    onPress={() => {
-                                        this.setState({ bioModalVisible: false, modalVisible: false });
-                                    }}
-                                >
-                                    <Text style={styles.textStyle}>        Sil        </Text>
-                                </TouchableHighlight>
-                            </View>
+                            <TouchableHighlight
+                                style={{ ...styles.openButton, backgroundColor: "red" }}
+                                onPress={() => {
+                                    this.setState({ bioModalVisible: false, modalVisible: false });
+                                    Toast.show({
+                                        text: "Şifre Silindi!",
+                                        buttonText: "Tamam",
+                                        type: "danger",
+                                    });
+                                    this.RemovingData(this.state.bioName);
+                                }}
+                            >
+                                <Text style={styles.textStyle}>        Sil        </Text>
+                            </TouchableHighlight>
                         </View>
-                    </Modal>
-                </Root>
+                    </View>
+                </Modal>
             )
         }
     }
@@ -306,48 +324,46 @@ class Main extends Component {
 
     CreatePassword() {
         return (
-            <Root>
-                <Container >
-                    <Content padder style={styles.createPassword}>
-                        <Form>
-                            <Item rounded>
-                                <Input
-                                    placeholder='Şifre Karakter Uzunluğu'
-                                    maxLength={2}
-                                    textAlign='center'
-                                    keyboardType='number-pad'
-                                    //value={this.state.charLength}
-                                    onChangeText={text => this.setState({ charLength: text })}
-                                />
-                            </Item>
-                        </Form>
+            <Container >
+                <Content padder style={styles.createPassword}>
+                    <Form>
+                        <Item rounded>
+                            <Input
+                                placeholder='Şifre Karakter Uzunluğu'
+                                maxLength={2}
+                                textAlign='center'
+                                keyboardType='number-pad'
+                                //value={this.state.charLength}
+                                onChangeText={text => this.setState({ charLength: text })}
+                            />
+                        </Item>
+                    </Form>
 
-                        <Button style={styles.loginButton}
-                            onPress={() => this.generatePassword()}>
-                            <Text>ŞİFRE OLUŞTUR</Text>
-                        </Button>
+                    <Button style={styles.loginButton}
+                        onPress={() => this.generatePassword()}>
+                        <Text>ŞİFRE OLUŞTUR</Text>
+                    </Button>
 
-                        <Text style={styles.newPassText}>{this.state.retVal}</Text>
+                    <Text style={styles.newPassText}>{this.state.retVal}</Text>
 
-                        <Button iconLeft
-                            style={styles.copyButton}
-                            onPress={() => {
-                                Clipboard.setString(this.state.retVal);
-                                Toast.show({
-                                    text: "Şifre Kopyalandı!",
-                                    buttonText: "Tamam",
-                                    type: "success"
-                                })
-                            }
-                            }
-                        >
-                            <Icon name='copy' />
-                            <Text>Kopyala</Text>
-                        </Button>
+                    <Button iconLeft
+                        style={styles.copyButton}
+                        onPress={() => {
+                            Clipboard.setString(this.state.retVal);
+                            Toast.show({
+                                text: "Şifre Kopyalandı!",
+                                buttonText: "Tamam",
+                                type: "success"
+                            })
+                        }
+                        }
+                    >
+                        <Icon name='copy' />
+                        <Text>Kopyala</Text>
+                    </Button>
 
-                    </Content>
-                </Container>
-            </Root>
+                </Content>
+            </Container>
         );
     }
 
@@ -376,7 +392,7 @@ class Main extends Component {
             //         else {
             //             alert("Parmak İzi Doğrulanamadı!")
             //         }
-            //     })
+            //     }) 
         }
 
         return (
@@ -405,7 +421,7 @@ class Main extends Component {
                     inactiveBackgroundColor: '#1b1b1b'
                 }}
             >
-                <Tab.Screen name="Şifreler" component={this.Passwords.bind(this)}/>
+                <Tab.Screen name="Şifreler" component={this.Passwords.bind(this)} />
                 <Tab.Screen name="Şifre Ekle" component={this.AddPassword.bind(this)} />
                 <Tab.Screen name="Şifre Oluştur" component={this.CreatePassword.bind(this)} />
             </Tab.Navigator>
