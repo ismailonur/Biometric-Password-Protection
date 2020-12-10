@@ -73,12 +73,11 @@ class Main extends Component {
     state = {
         name: "",
         password: "",
-        secondPassword: "",
         charLength: "",
         text: '',
         allPassword: [],
         firebaseControl: false,
-        retVal: "Şifre",
+        retVal: "Güçlü Şifre Burada Görünür!",
         modalVisible: false,
         bioName: '',
         bioPassword: '',
@@ -268,26 +267,21 @@ class Main extends Component {
 
     AddFirebase() {
         alert('firebase')
-        const { name, password, secondPassword } = this.state
-        if (password !== secondPassword) {
-            alert('Şifreler Uyuşmuyor!')
-        }
-        else {
-            database().ref(`PASS/${auth().currentUser.uid}/${name}`).set({
-                name: name,
-                subtitle: password
-            })
-            this.LoadingPassword();
-        }
+        const { name, password } = this.state
+        database().ref(`PASS/${auth().currentUser.uid}/${name}`).set({
+            name: name,
+            subtitle: password
+        })
+        this.LoadingPassword();
     }
 
     AddPassword() {
         return (
-            <Container>
-                <Content style={styles.container}>
+            <Container style={styles.addPassword}>
+                <Content>
                     <Form>
                         <Item floatingLabel>
-                            <Label>İsim</Label>
+                            <Label>Hesap</Label>
                             <Input
                                 //textAlign='center'
                                 autoCompleteType='email'
@@ -302,15 +296,6 @@ class Main extends Component {
                                 keyboardType='visible-password'
                                 textContentType='password'
                                 onChangeText={(text) => this.setState({ password: text })} />
-                        </Item>
-                        <Item floatingLabel>
-                            <Label>Şifre Tekrar</Label>
-                            <Input
-                                //textAlign='center'
-                                autoCompleteType='password'
-                                keyboardType='visible-password'
-                                textContentType='password'
-                                onChangeText={(text) => this.setState({ secondPassword: text })} />
                         </Item>
                     </Form>
                     <Button light block rounded style={styles.loginButton}
@@ -339,14 +324,16 @@ class Main extends Component {
                         </Item>
                     </Form>
 
-                    <Button style={styles.loginButton}
+                    <Button light
+                        style={styles.loginButton}
                         onPress={() => this.generatePassword()}>
                         <Text>ŞİFRE OLUŞTUR</Text>
                     </Button>
 
+                    <Text style={styles.newPassTextGuclu}>Güçlü Parola</Text>
                     <Text style={styles.newPassText}>{this.state.retVal}</Text>
 
-                    <Button iconLeft
+                    <Button iconLeft light
                         style={styles.copyButton}
                         onPress={() => {
                             Clipboard.setString(this.state.retVal);
@@ -435,7 +422,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#242424',
-        //paddingVertical: 130
+    },
+
+    addPassword: {
+        flex: 1,
+        backgroundColor: '#242424',
+        paddingVertical: 150,
+        paddingHorizontal: 50
     },
 
     yukleniyorView: {
@@ -481,6 +474,12 @@ const styles = StyleSheet.create({
     newPassText: {
         color: '#fff',
         textAlign: 'center'
+    },
+
+    newPassTextGuclu: {
+        color: '#c6b2ac',
+        textAlign: 'center',
+        fontSize: 20
     },
 
     centeredView: {
