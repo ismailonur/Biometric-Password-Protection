@@ -3,7 +3,7 @@ import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet, Modal
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ListItem } from 'react-native-elements';
-import { Root, Container, Content, Form, Item, Input, Label, Button, Text, Toast, Icon, Spinner } from 'native-base';
+import { Container, Content, Form, Item, Input, Label, Button, Text, Toast, Icon, Spinner } from 'native-base';
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import Clipboard from '@react-native-community/clipboard';
@@ -283,6 +283,7 @@ class Main extends Component {
                         <Item floatingLabel>
                             <Label>Hesap</Label>
                             <Input
+                                style={styles.textInputText}
                                 //textAlign='center'
                                 autoCompleteType='email'
                                 keyboardType='email-address'
@@ -291,6 +292,7 @@ class Main extends Component {
                         <Item floatingLabel>
                             <Label>Şifre</Label>
                             <Input
+                                style={styles.textInputText}
                                 //textAlign='center'
                                 autoCompleteType='password'
                                 keyboardType='visible-password'
@@ -298,9 +300,9 @@ class Main extends Component {
                                 onChangeText={(text) => this.setState({ password: text })} />
                         </Item>
                     </Form>
-                    <Button light block rounded style={styles.loginButton}
+                    <Button light block style={styles.loginButton}
                         onPress={() => this.AddFirebase()}>
-                        <Text>ŞİFRE'Yİ KAYDET</Text>
+                        <Text style={styles.buttonText}>        ŞİFRE'Yİ KAYDET        </Text>
                     </Button>
                 </Content>
             </Container>
@@ -314,6 +316,7 @@ class Main extends Component {
                     <Form>
                         <Item rounded>
                             <Input
+                                style={styles.textInputText}
                                 placeholder='Şifre Karakter Uzunluğu'
                                 maxLength={2}
                                 textAlign='center'
@@ -327,7 +330,7 @@ class Main extends Component {
                     <Button light
                         style={styles.loginButton}
                         onPress={() => this.generatePassword()}>
-                        <Text>ŞİFRE OLUŞTUR</Text>
+                        <Text style={styles.buttonText}>ŞİFRE OLUŞTUR</Text>
                     </Button>
 
                     <Text style={styles.newPassTextGuclu}>Güçlü Parola</Text>
@@ -345,8 +348,8 @@ class Main extends Component {
                         }
                         }
                     >
-                        <Icon name='copy' />
-                        <Text>Kopyala</Text>
+                        <Icon name='copy' style={{ color: '#fff' }} />
+                        <Text style={styles.buttonText}>Kopyala</Text>
                     </Button>
 
                 </Content>
@@ -488,9 +491,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 22
     },
+
     modalView: {
         margin: 20,
-        backgroundColor: "white",
+        backgroundColor: "#1b1b1b",
         borderRadius: 20,
         padding: 35,
         alignItems: "center",
@@ -503,21 +507,33 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5
     },
+
     openButton: {
-        backgroundColor: "#F194FF",
         borderRadius: 20,
         padding: 10,
         elevation: 2
     },
+
     textStyle: {
         color: "white",
         fontWeight: "bold",
         textAlign: "center"
     },
+
     modalText: {
+        color: "white",
         marginBottom: 15,
         textAlign: "center"
+    },
+
+    buttonText: {
+        color: '#fff'
+    },
+
+    textInputText: {
+        color: '#fff'
     }
+
 
 });
 
