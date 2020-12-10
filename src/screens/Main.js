@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableHighlight } from 'react-native'
+import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableHighlight, Image } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ListItem } from 'react-native-elements';
@@ -34,7 +34,8 @@ class Main extends Component {
         modalVisible: false,
         bioName: '',
         bioPassword: '',
-        bioModalVisible: false
+        bioModalVisible: false,
+        loadingControl: false
     }
 
     async componentDidMount() {
@@ -88,9 +89,17 @@ class Main extends Component {
     }
 
     async LoadingPassword() {
-        const data = await database().ref(`PASS/${auth().currentUser.uid}`).once('value')
-        const snapshot = Object.values(data.val())
-        this.setState({ allPassword: snapshot, firebaseControl: true })
+        this.setState({ loadingControl: false })
+        try {
+            const data = await database().ref(`PASS/${auth().currentUser.uid}`).once('value')
+            const snapshot = Object.values(data.val())
+            this.setState({ allPassword: snapshot, firebaseControl: true })
+        } catch (error) {
+            this.setState({ allPassword: 'error', firebaseControl: false })
+        } finally {
+            this.setState({ loadingControl: true })
+        }
+
     }
 
     generatePassword() {
@@ -191,6 +200,7 @@ class Main extends Component {
     }
 
     Passwords() {
+
         if (this.state.firebaseControl === true) {
             return (
                 <View style={styles.container}>
@@ -204,7 +214,18 @@ class Main extends Component {
                     }
                 </View>
             );
-        } else {
+        }
+        else {
+            if (this.state.allPassword === 'error') {
+                return (
+                    <View style={styles.veriYok}>
+                        <Image style={styles.image}
+                            source={require('../images/01.gif')} />
+                        <Text style={styles.yukleniyorText}>Veri Yok!</Text>
+                    </View>
+                )
+            }
+
             return (
                 <View style={styles.yukleniyorView}>
                     <Spinner color='red' />
@@ -232,7 +253,6 @@ class Main extends Component {
                             <Label>Hesap</Label>
                             <Input
                                 style={styles.textInputText}
-                                //textAlign='center'
                                 autoCompleteType='email'
                                 keyboardType='email-address'
                                 textContentType='emailAddress' onChangeText={(text) => this.setState({ name: text })} />
@@ -241,7 +261,6 @@ class Main extends Component {
                             <Label>Şifre</Label>
                             <Input
                                 style={styles.textInputText}
-                                //textAlign='center'
                                 autoCompleteType='password'
                                 keyboardType='visible-password'
                                 textContentType='password'
@@ -332,7 +351,7 @@ class Main extends Component {
                     else {
                         alert("Parmak İzi Doğrulanamadı!")
                     }
-                }) 
+                })
         }
 
         return (
@@ -384,6 +403,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30
     },
 
+    veriYok:{
+        flex: 1,
+        backgroundColor: '#141414',
+        alignItems: 'center'
+    },
+
     yukleniyorView: {
         flex: 1,
         backgroundColor: '#242424',
@@ -395,6 +420,12 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 24
+    },
+
+    image: {
+        width: '100%',
+        height: '50%',
+        resizeMode: 'contain'
     },
 
     renderItem: {
