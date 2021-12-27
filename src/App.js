@@ -5,11 +5,11 @@ import auth from '@react-native-firebase/auth';
 import { Root } from "native-base";
 
 // Screens
-import Welcome from './src/screens/Welcome';
-import Login from './src/screens/Login';
-import Signup from './src/screens/Signup';
-import Main from './src/screens/Main';
-import BioControl from './src/screens/BiometricControl';
+import Welcome from './screens/Welcome';
+import Login from './screens/Login';
+import Signup from './screens/Signup';
+import Main from './screens/Main';
+import BioControl from './screens/BiometricControl';
 
 const Stack = createStackNavigator();
 
