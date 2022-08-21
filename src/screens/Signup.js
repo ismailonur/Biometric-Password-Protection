@@ -2,9 +2,9 @@ import React, { Component } from 'react'
 import { StyleSheet } from 'react-native'
 import { Container, Content, Form, Item, Input, Label, Button, Text, Toast } from 'native-base';
 import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Signup extends Component {
-
     state = {
         email: "",
         password: "",
@@ -26,6 +26,7 @@ export default class Signup extends Component {
                         buttonText: "Tamam",
                         type: "success"
                     })
+                    this.storeData(this.state.kasaPassword)
                     this.props.navigation.navigate("Main")
                 })
                 .catch(error => {
@@ -55,6 +56,10 @@ export default class Signup extends Component {
         }
     }
 
+    async storeData(value) {
+        await AsyncStorage.setItem('my_secret_key', value)
+    }
+
     render() {
         return (
             <Container >
@@ -70,16 +75,7 @@ export default class Signup extends Component {
                                 onChangeText={(text) => this.setState({ email: text })} />
                         </Item>
                         <Item floatingLabel>
-                            <Label>Phone Number</Label>
-                            <Input
-                                style={styles.textInputText}
-                                autoCompleteType='tel'
-                                keyboardType='phone-pad'
-                                textContentType='telephoneNumber'
-                                onChangeText={(text) => this.setState({ phoneNumber: text })} />
-                        </Item>
-                        <Item floatingLabel>
-                            <Label>Password</Label>
+                            <Label>Hesap Şifresi</Label>
                             <Input
                                 style={styles.textInputText}
                                 autoCompleteType='password'
@@ -88,13 +84,22 @@ export default class Signup extends Component {
                                 onChangeText={(text) => this.setState({ password: text })} />
                         </Item>
                         <Item floatingLabel>
-                            <Label>Again Password</Label>
+                            <Label>Hesap Şifresi Tekrar</Label>
                             <Input
                                 style={styles.textInputText}
                                 autoCompleteType='password'
                                 keyboardType='visible-password'
                                 textContentType='password'
                                 onChangeText={(text) => this.setState({ againPassword: text })} />
+                        </Item>
+                        <Item floatingLabel>
+                            <Label>Kasa Şifresi</Label>
+                            <Input
+                                style={styles.textInputText}
+                                autoCompleteType='password'
+                                keyboardType='visible-password'
+                                textContentType='password'
+                                onChangeText={(text) => this.setState({ kasaPassword: text })} />
                         </Item>
                     </Form>
                     <Button light block rounded style={styles.signupButton}
@@ -112,7 +117,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1b1b1b',
-        paddingVertical: 100
+        paddingVertical: 100,
+        width: '90%',
+        alignSelf: 'center',
     },
 
     signupButton: {
@@ -127,7 +134,7 @@ const styles = StyleSheet.create({
         color: '#fff'
     },
 
-    kayitOlText:{
+    kayitOlText: {
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 15

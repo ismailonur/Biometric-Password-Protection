@@ -31,14 +31,13 @@ function App() {
 
   function checkUser() {
     let stacks;
+    console.log(user);
     if (user !== null) {
-      if (true) {
         stacks = <Stack.Screen name="BioControl" component={BioControl} options={{
           title: 'Biyometrik Koruma',
           headerLeft: false
         }} />;
         return stacks;
-      }
     }
 
     stacks = <Stack.Screen name={"Welcome"} component={Welcome}

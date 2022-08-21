@@ -8,20 +8,17 @@ import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import Clipboard from '@react-native-community/clipboard';
 import ReactNativeBiometrics from 'react-native-biometrics'
+import { AES_KEY } from '../Ops/key';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
+let biometryType = 'undefined'
+let my_secret_key = ''
 
 const Tab = createBottomTabNavigator();
 
 class Main extends Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            showToast: false
-        };
-    }
 
     state = {
         name: "",
@@ -35,20 +32,15 @@ class Main extends Component {
         bioName: '',
         bioPassword: '',
         bioModalVisible: false,
-        loadingControl: false
+        loadingControl: false,
+        showToast: false
     }
 
     async componentDidMount() {
-        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
         this.LoadingPassword();
-    }
 
-    componentWillUnmount() {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
-    }
-
-    onButtonPress = () => {
-        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+        biometryType = await ReactNativeBiometrics.isSensorAvailable();
+        my_secret_key = await AsyncStorage.getItem('my_secret_key');
     }
 
     handleBackButton = () => {
@@ -99,7 +91,6 @@ class Main extends Component {
         } finally {
             this.setState({ loadingControl: true })
         }
-
     }
 
     generatePassword() {
@@ -120,6 +111,7 @@ class Main extends Component {
 
     Modal() {
         const { bioModalVisible, modalVisible } = this.state;
+        const password = AES_KEY.decryptData(this.state.bioPassword, my_secret_key);
 
         this.setState({ modalVisible: false })
 
@@ -136,7 +128,8 @@ class Main extends Component {
                     <View style={styles.centeredView}>
                         <View style={styles.modalView}>
                             <Text style={styles.modalText}>{this.state.bioName}</Text>
-                            <Text style={styles.modalText}>{this.state.bioPassword}</Text>
+                            {/* <Text style={styles.modalText}>{this.state.bioPassword}</Text> */}
+                            <Text style={styles.modalText}>{password}</Text>
 
                             <TouchableHighlight
                                 style={{ ...styles.openButton, backgroundColor: "#2196F3", marginTop: 10 }}
@@ -200,7 +193,6 @@ class Main extends Component {
     }
 
     Passwords() {
-
         if (this.state.firebaseControl === true) {
             return (
                 <View style={styles.container}>
@@ -235,19 +227,75 @@ class Main extends Component {
         }
     }
 
-    AddFirebase() {
+    async AddFirebase() {
+        console.log("AddFirebase")
         const { name, password } = this.state
+        const aeskey = await AES_KEY.generateKey();
+        console.log("AddFirebase1")
+        const hash = AES_KEY.encryptData(password, aeskey);
+        console.log("AddFirebase2")
         database().ref(`PASS/${auth().currentUser.uid}/${name}`).set({
             name: name,
-            subtitle: password
+            subtitle: hash
         })
-        this.LoadingPassword();
+        console.log("AddFirebase3")
+        await this.LoadingPassword();
+        console.log("AddFirebase4")
     }
 
     AddPassword() {
         return (
             <Container style={styles.container}>
                 <Content style={styles.addPassword}>
+                    <Form style={{ width: '60%', alignSelf: 'center' }}>
+                        <Item rounded>
+                            <Input
+                                style={styles.textInputText}
+                                placeholder='Şifre Karakter Uzunluğu'
+                                maxLength={2}
+                                textAlign='center'
+                                keyboardType='number-pad'
+                                onChangeText={text => this.setState({ charLength: text })}
+                            />
+                        </Item>
+                    </Form>
+
+                    <Button light
+                        style={styles.loginButton}
+                        onPress={() => this.generatePassword()}>
+                        <Text style={styles.buttonText}>ŞİFRE OLUŞTUR</Text>
+                    </Button>
+
+                    {
+                        this.state.retVal == "" &&
+                        <Text style={styles.newPassTextGuclu}>Güçlü Parola Burada Görünecek</Text>
+                    }
+                    <Text style={styles.newPassText}>{this.state.retVal}</Text>
+
+                    <Button iconLeft light
+                        style={styles.copyButton}
+                        onPress={() => {
+                            if (this.state.retVal == "") {
+                                Toast.show({
+                                    text: "Güçlü Şifre Yok!",
+                                    buttonText: "Tamam",
+                                    type: "danger"
+                                })
+                            } else {
+                                Clipboard.setString(this.state.retVal);
+                                Toast.show({
+                                    text: "Şifre Kopyalandı!",
+                                    buttonText: "Tamam",
+                                    type: "success"
+                                })
+                            }
+                            this.setState({ retVal: "" })
+                        }}
+                    >
+                        <Icon name='copy' style={{ color: '#fff' }} />
+                        <Text style={styles.buttonText}>Kopyala</Text>
+                    </Button>
+
                     <Form >
                         <Item floatingLabel>
                             <Label>Hesap</Label>
@@ -255,7 +303,8 @@ class Main extends Component {
                                 style={styles.textInputText}
                                 autoCompleteType='email'
                                 keyboardType='email-address'
-                                textContentType='emailAddress' onChangeText={(text) => this.setState({ name: text })} />
+                                textContentType='emailAddress'
+                                onChangeText={(text) => this.setState({ name: text })} />
                         </Item>
                         <Item floatingLabel>
                             <Label>Şifre</Label>
@@ -283,50 +332,13 @@ class Main extends Component {
         );
     }
 
-    CreatePassword() {
+    Profil() {
         return (
-            <Container >
-                <Content padder style={styles.createPassword}>
-                    <Form>
-                        <Item rounded>
-                            <Input
-                                style={styles.textInputText}
-                                placeholder='Şifre Karakter Uzunluğu'
-                                maxLength={2}
-                                textAlign='center'
-                                keyboardType='number-pad'
-                                onChangeText={text => this.setState({ charLength: text })}
-                            />
-                        </Item>
-                    </Form>
-
-                    <Button light
-                        style={styles.loginButton}
-                        onPress={() => this.generatePassword()}>
-                        <Text style={styles.buttonText}>ŞİFRE OLUŞTUR</Text>
-                    </Button>
-
-                    <Text style={styles.newPassTextGuclu}>Güçlü Parola</Text>
-                    <Text style={styles.newPassText}>{this.state.retVal}</Text>
-
-                    <Button iconLeft light
-                        style={styles.copyButton}
-                        onPress={() => {
-                            Clipboard.setString(this.state.retVal);
-                            Toast.show({
-                                text: "Şifre Kopyalandı!",
-                                buttonText: "Tamam",
-                                type: "success"
-                            })
-                        }
-                        }
-                    >
-                        <Icon name='copy' style={{ color: '#fff' }} />
-                        <Text style={styles.buttonText}>Kopyala</Text>
-                    </Button>
-
-                </Content>
-            </Container>
+            <View>
+                <Text>
+                    Profil
+                </Text>
+            </View>
         );
     }
 
@@ -336,6 +348,8 @@ class Main extends Component {
                 .then((resultObject) => {
                     const { publicKey } = resultObject
                     //alert(publicKey)
+                }).catch((error) => {
+                    console.log(error)
                 })
 
             ReactNativeBiometrics.createSignature({
@@ -351,7 +365,9 @@ class Main extends Component {
                     else {
                         alert("Parmak İzi Doğrulanamadı!")
                     }
-                })
+                }).catch((error) => {
+                    console.log(error)
+                });
         }
 
         return (
@@ -364,9 +380,9 @@ class Main extends Component {
                             iconName = focused
                                 ? 'server-outline'
                                 : 'server-outline';
-                        } else if (route.name === 'Şifre Oluştur') {
+                        } else if (route.name === 'Şifre Oluştur Ekle') {
                             iconName = focused ? 'key-outline' : 'key-outline';
-                        } else if (route.name === 'Şifre Ekle') {
+                        } else if (route.name === 'Profil') {
                             iconName = focused ? 'finger-print-outline' : 'finger-print-outline';
                         }
 
@@ -381,8 +397,8 @@ class Main extends Component {
                 }}
             >
                 <Tab.Screen name="Şifreler" component={this.Passwords.bind(this)} />
-                <Tab.Screen name="Şifre Ekle" component={this.AddPassword.bind(this)} />
-                <Tab.Screen name="Şifre Oluştur" component={this.CreatePassword.bind(this)} />
+                <Tab.Screen name="Şifre Oluştur Ekle" component={this.AddPassword.bind(this)} />
+                {/* <Tab.Screen name="Profil" component={this.Profil.bind(this)} /> */}
             </Tab.Navigator>
         )
     }
@@ -399,11 +415,11 @@ const styles = StyleSheet.create({
     addPassword: {
         flex: 1,
         backgroundColor: '#242424',
-        paddingTop: 150,
+        paddingTop: 50,
         paddingHorizontal: 30
     },
 
-    veriYok:{
+    veriYok: {
         flex: 1,
         backgroundColor: '#141414',
         alignItems: 'center'
@@ -438,7 +454,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#1b1b1b',
         paddingVertical: 150,
         paddingHorizontal: 80
-
     },
 
     loginButton: {

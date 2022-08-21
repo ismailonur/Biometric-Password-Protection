@@ -8,7 +8,7 @@ import { Toast } from 'native-base';
 
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
-const biometryType = 'undefined'
+let biometryType = 'undefined'
 
 export default class BiometricControl extends Component {
 
@@ -65,7 +65,9 @@ export default class BiometricControl extends Component {
             ReactNativeBiometrics.createKeys('Confirm fingerprint')
                 .then((resultObject) => {
                     const { publicKey } = resultObject
-                })
+                }).catch((error) => {
+                    console.log(error)
+                });
 
             ReactNativeBiometrics.createSignature({
                 promptMessage: 'Giriş Yap!',
@@ -84,6 +86,8 @@ export default class BiometricControl extends Component {
                             type: "danger"
                         })
                     }
+                }).catch((error) => {
+                    console.log(error)
                 })
         } else {
             return (

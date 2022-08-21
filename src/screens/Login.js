@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import { StyleSheet } from 'react-native';
 import { Container, Content, Form, Item, Input, Label, Button, Text, Toast } from 'native-base';
 import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Login extends Component {
 
     state = {
         email: "",
-        password: ""
+        password: "",
+        kasaPassword: ""
     }
 
     GoLogin() {
@@ -20,7 +22,8 @@ export default class Login extends Component {
                     buttonText: "Tamam",
                     type: "success"
                 })
-                this.props.navigation.navigate("Main")
+                this.storeData(this.state.kasaPassword);
+                this.props.navigation.navigate("Main");
             })
             .catch((error) => {
                 Toast.show({
@@ -29,6 +32,10 @@ export default class Login extends Component {
                     type: "danger"
                 })
             })
+    }
+
+    async storeData(value) {
+        await AsyncStorage.setItem('my_secret_key', value)
     }
 
     render() {
@@ -42,7 +49,8 @@ export default class Login extends Component {
                                 style={styles.textInputText}
                                 autoCompleteType='email'
                                 keyboardType='email-address'
-                                textContentType='emailAddress' onChangeText={(text) => this.setState({ email: text })} />
+                                textContentType='emailAddress'
+                                onChangeText={(text) => this.setState({ email: text })} />
                         </Item>
                         <Item floatingLabel>
                             <Label>Şifre</Label>
@@ -52,6 +60,15 @@ export default class Login extends Component {
                                 keyboardType='visible-password'
                                 textContentType='password'
                                 onChangeText={(text) => this.setState({ password: text })} />
+                        </Item>
+                        <Item floatingLabel>
+                            <Label>Kasa Şifresi</Label>
+                            <Input
+                                style={styles.textInputText}
+                                autoCompleteType='password'
+                                keyboardType='visible-password'
+                                textContentType='password'
+                                onChangeText={(text) => this.setState({ kasaPassword: text })} />
                         </Item>
                     </Form>
                     <Button light block rounded style={styles.loginButton}
@@ -69,7 +86,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#1b1b1b',
-        paddingVertical: 130
+        paddingVertical: 130,
+        width: '90%',
+        alignSelf: 'center',
     },
 
     loginButton: {
