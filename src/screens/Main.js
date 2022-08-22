@@ -16,6 +16,7 @@ let payload = epochTimeSeconds + 'some message'
 let biometryType = 'undefined'
 let my_secret_key = ''
 
+
 const Tab = createBottomTabNavigator();
 
 class Main extends Component {
@@ -36,10 +37,9 @@ class Main extends Component {
     }
 
     async componentDidMount() {
-        this.LoadingPassword();
-
-        biometryType = await ReactNativeBiometrics.isSensorAvailable();
         my_secret_key = await AsyncStorage.getItem('my_secret_key');
+        this.LoadingPassword();
+        biometryType = await ReactNativeBiometrics.isSensorAvailable();
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -321,30 +321,34 @@ class Main extends Component {
 
     render() {
         if (this.state.modalVisible === true) {
-            ReactNativeBiometrics.createKeys('Confirm fingerprint')
-                .then((resultObject) => {
-                    const { publicKey } = resultObject
-                    //alert(publicKey)
-                }).catch((error) => {
-                    console.log(error)
+            if (biometryType === ReactNativeBiometrics.Biometrics) {
+                ReactNativeBiometrics.createKeys('Confirm fingerprint')
+                    .then((resultObject) => {
+                        const { publicKey } = resultObject
+                        //alert(publicKey)
+                    }).catch((error) => {
+                        console.log(error)
+                    })
+
+                ReactNativeBiometrics.createSignature({
+                    promptMessage: 'Parmak İzi Doğrula',
+                    payload: payload
                 })
+                    .then((resultObject) => {
+                        const { success, signature } = resultObject
 
-            ReactNativeBiometrics.createSignature({
-                promptMessage: 'Parmak İzi Doğrula',
-                payload: payload
-            })
-                .then((resultObject) => {
-                    const { success, signature } = resultObject
-
-                    if (success) {
-                        this.setState({ bioModalVisible: true })
-                    }
-                    else {
-                        alert("Parmak İzi Doğrulanamadı!")
-                    }
-                }).catch((error) => {
-                    console.log(error)
-                });
+                        if (success) {
+                            this.setState({ bioModalVisible: true })
+                        }
+                        else {
+                            alert("Parmak İzi Doğrulanamadı!")
+                        }
+                    }).catch((error) => {
+                        console.log(error)
+                    });
+            } else {
+                this.setState({ bioModalVisible: true })
+            }
         }
 
         return (

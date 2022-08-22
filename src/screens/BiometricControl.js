@@ -4,9 +4,6 @@ import ReactNativeBiometrics from 'react-native-biometrics'
 import { Toast } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// import { Clickable, P } from '~components'
-// import { W, H } from '~dimensions'
-
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
 let biometryType = 'undefined'
