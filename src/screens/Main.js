@@ -43,23 +43,6 @@ class Main extends Component {
         my_secret_key = await AsyncStorage.getItem('my_secret_key');
     }
 
-    handleBackButton = () => {
-        Alert.alert(
-            'Uygulamadan Çık',
-            'Uygulamadan çıkılsın mı?', [{
-                text: 'Hayır',
-                onPress: () => console.log('Hayır Basıldı!'),
-                style: 'cancel'
-            }, {
-                text: 'Evet',
-                onPress: () => BackHandler.exitApp()
-            },], {
-            cancelable: false
-        }
-        )
-        return true;
-    }
-
     shouldComponentUpdate(nextProps, nextState) {
         if (nextState.allPassword !== this.state.allPassword) {
             return true
@@ -228,19 +211,14 @@ class Main extends Component {
     }
 
     async AddFirebase() {
-        console.log("AddFirebase")
         const { name, password } = this.state
         const aeskey = await AES_KEY.generateKey();
-        console.log("AddFirebase1")
         const hash = AES_KEY.encryptData(password, aeskey);
-        console.log("AddFirebase2")
         database().ref(`PASS/${auth().currentUser.uid}/${name}`).set({
             name: name,
             subtitle: hash
         })
-        console.log("AddFirebase3")
         await this.LoadingPassword();
-        console.log("AddFirebase4")
     }
 
     AddPassword() {
@@ -406,7 +384,6 @@ class Main extends Component {
 
 
 const styles = StyleSheet.create({
-
     container: {
         flex: 1,
         backgroundColor: '#242424',
@@ -460,7 +437,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#808080',
         justifyContent: 'center',
         alignSelf: 'center',
-        marginVertical: 80,
+        marginVertical: 50,
         marginHorizontal: 30
     },
 

@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const sec_generateKey = async () => {
     const value = await AsyncStorage.getItem('my_secret_key');
-    console.log("AAAAAAAAAA", value);
     return value;
 }
 

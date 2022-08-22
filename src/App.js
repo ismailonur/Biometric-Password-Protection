@@ -31,7 +31,6 @@ function App() {
 
   function checkUser() {
     let stacks;
-    console.log(user);
     if (user !== null) {
         stacks = <Stack.Screen name="BioControl" component={BioControl} options={{
           title: 'Biyometrik Koruma',

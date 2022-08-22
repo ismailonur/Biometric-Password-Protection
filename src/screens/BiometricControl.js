@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Text, View, StyleSheet, Image, Modal, TouchableOpacity, Button, TextInput } from 'react-native'
 import ReactNativeBiometrics from 'react-native-biometrics'
 import { Toast } from 'native-base';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // import { Clickable, P } from '~components'
 // import { W, H } from '~dimensions'
@@ -9,12 +10,31 @@ import { Toast } from 'native-base';
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
 let biometryType = 'undefined'
+let kasaPass = ''
 
 export default class BiometricControl extends Component {
-
     state = {
         modalVisible: true,
         number: ''
+    }
+
+    async componentDidMount() {
+        biometryType = await ReactNativeBiometrics.isSensorAvailable();
+        kasaPass = await AsyncStorage.getItem('my_secret_key');
+    }
+
+    okeyButton = () => {
+        if(this.state.number === kasaPass){
+            this.setState({ modalVisible: false })
+            this.props.navigation.navigate("Main")
+        }
+        if(this.state.number !== kasaPass){
+            Toast.show({
+                text: "Şifre Hatalı!",
+                buttonText: "Tamam",
+                type: "danger"
+            })
+        }
     }
 
     modal() {
@@ -33,7 +53,7 @@ export default class BiometricControl extends Component {
                 <TouchableOpacity style={styles.centeredView} onPress={() => this.setState({ modalVisible: false })} activeOpacity={1}>
                     <View style={styles.modalView}>
                         <Text>
-                            Lütfen Şifre Giriniz!
+                            Lütfen Kasa Şifrenizi Giriniz!
                         </Text>
                         <View style={styles.parentHr} />
                         <TextInput
@@ -45,19 +65,12 @@ export default class BiometricControl extends Component {
                         />
                         <Button
                             title="Tamam"
-                            onPress={() => {
-                                this.props.navigation.navigate("Main"),
-                                    this.setState({ modalVisible: false })
-                            }}
+                            onPress={this.okeyButton}
                         />
                     </View>
                 </TouchableOpacity>
             </Modal>
         )
-    }
-
-    async componentDidMount() {
-        biometryType = await ReactNativeBiometrics.isSensorAvailable();
     }
 
     render() {
@@ -132,6 +145,7 @@ const styles = StyleSheet.create({
         margin: 12,
         borderWidth: 1,
         padding: 10,
+        borderRadius: 10,
     },
 
     // Modal Styles START
@@ -140,7 +154,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         marginTop: 22,
-        backgroundColor: 'rgba(0,0,0, 0.4)',
+        backgroundColor: 'rgba(0,0,0, 0.2)',
     },
 
     modalView: {
