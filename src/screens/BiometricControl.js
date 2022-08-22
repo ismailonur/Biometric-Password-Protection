@@ -20,10 +20,10 @@ export default class BiometricControl extends Component {
 
     async componentDidMount() {
         biometryType = await ReactNativeBiometrics.isSensorAvailable();
-        kasaPass = await AsyncStorage.getItem('my_secret_key');
     }
 
-    okeyButton = () => {
+    okeyButton = async () => {
+        kasaPass = await AsyncStorage.getItem('my_secret_key');
         if(this.state.number === kasaPass){
             this.setState({ modalVisible: false })
             this.props.navigation.navigate("Main")

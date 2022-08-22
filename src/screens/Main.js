@@ -19,7 +19,6 @@ let my_secret_key = ''
 const Tab = createBottomTabNavigator();
 
 class Main extends Component {
-
     state = {
         name: "",
         password: "",
