@@ -1,31 +1,34 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, Image, Modal, TouchableOpacity, Button, TextInput } from 'react-native'
-import ReactNativeBiometrics from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 import { Toast } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const rnBiometrics = new ReactNativeBiometrics();
+
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
-let biometryType = 'undefined'
 let kasaPass = ''
 
 export default class BiometricControl extends Component {
     state = {
-        modalVisible: true,
-        number: ''
+        modalVisible: false,
+        number: '',
+        biometryType: ''
     }
 
-    async componentDidMount() {
-        biometryType = await ReactNativeBiometrics.isSensorAvailable();
+    componentDidMount = async () => {
+        const { biometryType } = await rnBiometrics.isSensorAvailable();
+        this.setState({ biometryType })
     }
 
     okeyButton = async () => {
         kasaPass = await AsyncStorage.getItem('my_secret_key');
-        if(this.state.number === kasaPass){
+        if (this.state.number === kasaPass) {
             this.setState({ modalVisible: false })
             this.props.navigation.navigate("Main")
         }
-        if(this.state.number !== kasaPass){
+        if (this.state.number !== kasaPass) {
             Toast.show({
                 text: "Şifre Hatalı!",
                 buttonText: "Tamam",
@@ -36,6 +39,9 @@ export default class BiometricControl extends Component {
 
     modal() {
         const { modalVisible, number } = this.state;
+        setTimeout(() => {
+            this.setState({ modalVisible: true })
+        } , 2000)
         return (
             <Modal
                 statusBarTranslucent
@@ -55,7 +61,7 @@ export default class BiometricControl extends Component {
                         <View style={styles.parentHr} />
                         <TextInput
                             style={styles.input}
-                            onChangeText={(t) => this.setState({number: t})}
+                            onChangeText={(t) => this.setState({ number: t })}
                             value={number}
                             placeholder="Şifre"
                             keyboardType="numeric"
@@ -71,15 +77,16 @@ export default class BiometricControl extends Component {
     }
 
     render() {
-        if (biometryType === ReactNativeBiometrics.Biometrics) {
-            ReactNativeBiometrics.createKeys('Confirm fingerprint')
+        const { biometryType } = this.state;
+        if (biometryType === BiometryTypes.Biometrics) {
+            rnBiometrics.createKeys('Confirm fingerprint')
                 .then((resultObject) => {
                     const { publicKey } = resultObject
                 }).catch((error) => {
                     console.log(error)
                 });
 
-            ReactNativeBiometrics.createSignature({
+            rnBiometrics.createSignature({
                 promptMessage: 'Giriş Yap!',
                 payload: payload
             })
@@ -99,18 +106,20 @@ export default class BiometricControl extends Component {
                 }).catch((error) => {
                     console.log(error)
                 })
-        } else {
-            return (
-                <View style={styles.container}>
-                    {this.modal()}
-                </View>
-            )
         }
         return (
             <View style={styles.container}>
-                <Text style={styles.text}>Biyometrik Kontrol Sağlanıyor!</Text>
-                <Image style={styles.image}
-                    source={require('../images/01.gif')} />
+                {
+                    biometryType === BiometryTypes.Biometrics ?
+                        <>
+                            <Text style={styles.text}>Biyometrik Kontrol Sağlanıyor!</Text>
+                            <Image style={styles.image}
+                                source={require('../images/01.gif')} />
+                        </> :
+                        <>
+                            {this.modal()}
+                        </>
+                }
             </View>
         )
     }

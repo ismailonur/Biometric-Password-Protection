@@ -7,13 +7,14 @@ import { Container, Content, Form, Item, Input, Label, Button, Text, Toast, Icon
 import database from '@react-native-firebase/database';
 import auth from '@react-native-firebase/auth';
 import Clipboard from '@react-native-community/clipboard';
-import ReactNativeBiometrics from 'react-native-biometrics'
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 import { AES_KEY } from '../Ops/key';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const rnBiometrics = new ReactNativeBiometrics();
+
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
-let biometryType = 'undefined'
 let my_secret_key = ''
 
 
@@ -33,13 +34,15 @@ class Main extends Component {
         bioPassword: '',
         bioModalVisible: false,
         loadingControl: false,
-        showToast: false
+        showToast: false,
+        biometryType: '',
     }
 
     async componentDidMount() {
         my_secret_key = await AsyncStorage.getItem('my_secret_key');
         this.LoadingPassword();
-        biometryType = await ReactNativeBiometrics.isSensorAvailable();
+        const { biometryType } = await rnBiometrics.isSensorAvailable();
+        this.setState({ biometryType });
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -320,9 +323,10 @@ class Main extends Component {
     }
 
     render() {
+        const { biometryType } = this.state;
         if (this.state.modalVisible === true) {
-            if (biometryType === ReactNativeBiometrics.Biometrics) {
-                ReactNativeBiometrics.createKeys('Confirm fingerprint')
+            if (biometryType === BiometryTypes.Biometrics) {
+                rnBiometrics.createKeys('Confirm fingerprint')
                     .then((resultObject) => {
                         const { publicKey } = resultObject
                         //alert(publicKey)
@@ -330,7 +334,7 @@ class Main extends Component {
                         console.log(error)
                     })
 
-                ReactNativeBiometrics.createSignature({
+                rnBiometrics.createSignature({
                     promptMessage: 'Parmak İzi Doğrula',
                     payload: payload
                 })
