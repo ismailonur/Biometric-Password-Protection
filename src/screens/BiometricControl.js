@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, Image, Modal, TouchableOpacity, Button, TextInput } from 'react-native'
-import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
+
 import { Toast } from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ReactNativeBiometrics, { BiometryTypes } from 'react-native-biometrics'
 
 const rnBiometrics = new ReactNativeBiometrics();
 
@@ -20,10 +21,38 @@ export default class BiometricControl extends Component {
     componentDidMount = async () => {
         const { biometryType } = await rnBiometrics.isSensorAvailable();
         this.setState({ biometryType })
+        this.biometricControl();
+    }
+
+    biometricControl = async () => {
+        const { biometryType } = this.state;
+        if (biometryType === BiometryTypes.Biometrics) {
+            await rnBiometrics.createKeys('Confirm fingerprint')
+
+            const { success, signature } = await rnBiometrics.createSignature({
+                promptMessage: 'Giriş Yap!',
+                payload: payload
+            })
+
+            if (success) {
+                this.props.navigation.navigate("Main")
+            }
+            else {
+                Toast.show({
+                    text: "Giriş Sağlanamadı!",
+                    buttonText: "Tamam",
+                    type: "danger"
+                })
+            }
+        }
+        if (biometryType !== BiometryTypes.Biometrics) {
+            this.setState({ modalVisible: true })
+        }
     }
 
     okeyButton = async () => {
         kasaPass = await AsyncStorage.getItem('my_secret_key');
+        console.log(kasaPass)
         if (this.state.number === kasaPass) {
             this.setState({ modalVisible: false })
             this.props.navigation.navigate("Main")
@@ -39,9 +68,6 @@ export default class BiometricControl extends Component {
 
     modal() {
         const { modalVisible, number } = this.state;
-        setTimeout(() => {
-            this.setState({ modalVisible: true })
-        } , 2000)
         return (
             <Modal
                 statusBarTranslucent
@@ -77,56 +103,21 @@ export default class BiometricControl extends Component {
     }
 
     render() {
-        const { biometryType } = this.state;
-        if (biometryType === BiometryTypes.Biometrics) {
-            rnBiometrics.createKeys('Confirm fingerprint')
-                .then((resultObject) => {
-                    const { publicKey } = resultObject
-                }).catch((error) => {
-                    console.log(error)
-                });
-
-            rnBiometrics.createSignature({
-                promptMessage: 'Giriş Yap!',
-                payload: payload
-            })
-                .then((resultObject) => {
-                    const { success, signature } = resultObject
-
-                    if (success) {
-                        this.props.navigation.navigate("Main")
-                    }
-                    else {
-                        Toast.show({
-                            text: "Giriş Sağlanamadı!",
-                            buttonText: "Tamam",
-                            type: "danger"
-                        })
-                    }
-                }).catch((error) => {
-                    console.log(error)
-                })
-        }
         return (
             <View style={styles.container}>
-                {
-                    biometryType === BiometryTypes.Biometrics ?
-                        <>
-                            <Text style={styles.text}>Biyometrik Kontrol Sağlanıyor!</Text>
-                            <Image style={styles.image}
-                                source={require('../images/01.gif')} />
-                        </> :
-                        <>
-                            {this.modal()}
-                        </>
-                }
+                {this.modal()}
+                <Text style={styles.text}>Biyometrik Kontrol Sağlanıyor!</Text>
+                <Image style={styles.image}
+                    source={require('../images/01.gif')} />
+                <TouchableOpacity onPress={this.biometricControl} style={styles.loginButton}>
+                    <Text style={styles.textButton}>Giriş Yap</Text>
+                </TouchableOpacity>
             </View>
         )
     }
 }
 
 const styles = StyleSheet.create({
-
     container: {
         flex: 1,
         backgroundColor: '#141414',
@@ -152,6 +143,23 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         padding: 10,
         borderRadius: 10,
+    },
+
+    loginButton: {
+        borderWidth: 1,
+        borderColor: '#fff',
+        padding: 10,
+        marginTop: '15%',
+        marginHorizontal: '30%',
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    textButton: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold'
     },
 
     // Modal Styles START

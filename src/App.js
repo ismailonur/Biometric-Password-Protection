@@ -17,33 +17,31 @@ function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
 
-  function onAuthStateChanged(user) {
-    setUser(user);
-    if (initializing) setInitializing(false);
-  }
-
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber;
   }, []);
 
-  if (initializing) return null;
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
 
   function checkUser() {
-    let stacks;
     if (user !== null) {
-        stacks = <Stack.Screen name="BioControl" component={BioControl} options={{
+      return <Stack.Screen name="BioControl" component={BioControl}
+        options={{
           title: 'Biyometrik Koruma',
           headerLeft: false
         }} />;
-        return stacks;
     }
 
-    stacks = <Stack.Screen name={"Welcome"} component={Welcome}
+    return <Stack.Screen name={"Welcome"} component={Welcome}
       options={{ title: "Güvenle Sakla" }}
     />
-    return stacks;
   }
+
+  if (initializing) return null;
 
   return (
     <Root>

@@ -3,7 +3,6 @@ import { View, Image, StyleSheet} from 'react-native'
 import { Button, Text } from 'native-base';
 
 export default class Welcome extends Component {
-
     render() {
         return (
             <View style={styles.container}>

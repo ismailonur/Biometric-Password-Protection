@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { StyleSheet } from 'react-native'
+
 import { Container, Content, Form, Item, Input, Label, Button, Text, Toast } from 'native-base';
 import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -62,7 +63,7 @@ export default class Signup extends Component {
 
     render() {
         return (
-            <Container >
+            <Container>
                 <Content style={styles.container}>
                     <Form>
                         <Item floatingLabel>
@@ -113,7 +114,6 @@ export default class Signup extends Component {
 }
 
 const styles = StyleSheet.create({
-
     container: {
         flex: 1,
         backgroundColor: '#1b1b1b',

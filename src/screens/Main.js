@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, BackHandler, Alert, FlatList, TouchableOpacity, StyleSheet, Modal, TouchableHighlight, Image } from 'react-native'
+
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { ListItem } from 'react-native-elements';
@@ -12,13 +13,11 @@ import { AES_KEY } from '../Ops/key';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const rnBiometrics = new ReactNativeBiometrics();
+const Tab = createBottomTabNavigator();
 
 let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
 let payload = epochTimeSeconds + 'some message'
 let my_secret_key = ''
-
-
-const Tab = createBottomTabNavigator();
 
 class Main extends Component {
     state = {
@@ -43,22 +42,28 @@ class Main extends Component {
         this.LoadingPassword();
         const { biometryType } = await rnBiometrics.isSensorAvailable();
         this.setState({ biometryType });
+        BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextState.allPassword !== this.state.allPassword) {
-            return true
+    componentWillUnmount() {
+        BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
+    }
+
+    handleBackButton = () => {
+        Alert.alert(
+            'Uygulamadan Çık',
+            'Uygulamadan çıkılsın mı?', [{
+                text: 'Hayır',
+                onPress: () => console.log('Hayır Basıldı!'),
+                style: 'cancel'
+            }, {
+                text: 'Evet',
+                onPress: () => BackHandler.exitApp()
+            },], {
+            cancelable: false
         }
-        if (nextState.retVal !== this.state.retVal) {
-            return true
-        }
-        if (nextState.modalVisible !== this.state.modalVisible) {
-            return true
-        }
-        if (nextState.bioModalVisible !== this.state.bioModalVisible) {
-            return true
-        }
-        return nextProps !== this.props && nextState !== this.state;
+        )
+        return true;
     }
 
     setModalVisible = (visible, name, password) => {
@@ -79,9 +84,9 @@ class Main extends Component {
     }
 
     generatePassword() {
-        var charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!^&*_+|?><,-=",
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!^&*_+|?><,-=",
             retValFor = "";
-        for (var i = 0, n = charset.length; i < this.state.charLength; ++i) {
+        for (let i = 0, n = charset.length; i < this.state.charLength; ++i) {
             retValFor += charset.charAt(Math.floor(Math.random() * n));
         }
         this.setState({ retVal: retValFor })
@@ -94,11 +99,29 @@ class Main extends Component {
         this.LoadingPassword()
     }
 
+    biometricControl = async () => {
+        const { biometryType } = this.state;
+
+        if (biometryType === BiometryTypes.Biometrics) {
+            await rnBiometrics.createKeys('Confirm fingerprint')
+
+            const { success } = await rnBiometrics.createSignature({
+                promptMessage: 'Parmak İzi Doğrula',
+                payload: payload
+            })
+            if (success) {
+                this.setState({ bioModalVisible: true })
+            } else {
+                alert('Parmak İzi Doğrulanamadı')
+            }
+        } else {
+            this.setState({ bioModalVisible: true })
+        }
+    }
+
     Modal() {
         const { bioModalVisible, modalVisible } = this.state;
         const password = AES_KEY.decryptData(this.state.bioPassword, my_secret_key);
-
-        this.setState({ modalVisible: false })
 
         if (bioModalVisible === true) {
             return (
@@ -163,17 +186,15 @@ class Main extends Component {
 
     renderItem = ({ item }) => {
         return (
-            <View>
-                <TouchableOpacity onPress={() => this.setModalVisible(true, item.name, item.subtitle)} >
-                    <ListItem bottomDivider containerStyle={styles.renderItem}>
-                        <ListItem.Content>
-                            <ListItem.Title style={{ color: '#fff' }}>{item.name}</ListItem.Title>
-                            <ListItem.Subtitle style={{ color: 'gray' }}>***************</ListItem.Subtitle>
-                        </ListItem.Content>
-                        <ListItem.Chevron />
-                    </ListItem>
-                </TouchableOpacity>
-            </View>
+            <TouchableOpacity onPress={() => { this.setModalVisible(true, item.name, item.subtitle); this.biometricControl() }} >
+                <ListItem bottomDivider containerStyle={styles.renderItem}>
+                    <ListItem.Content>
+                        <ListItem.Title style={{ color: '#fff' }}>{item.name}</ListItem.Title>
+                        <ListItem.Subtitle style={{ color: 'gray' }}>***************</ListItem.Subtitle>
+                    </ListItem.Content>
+                    <ListItem.Chevron />
+                </ListItem>
+            </TouchableOpacity>
         )
     }
 
@@ -192,24 +213,22 @@ class Main extends Component {
                 </View>
             );
         }
-        else {
-            if (this.state.allPassword === 'error') {
-                return (
-                    <View style={styles.veriYok}>
-                        <Image style={styles.image}
-                            source={require('../images/01.gif')} />
-                        <Text style={styles.yukleniyorText}>Veri Yok!</Text>
-                    </View>
-                )
-            }
-
+        if (this.state.allPassword === 'error') {
             return (
-                <View style={styles.yukleniyorView}>
-                    <Spinner color='red' />
-                    <Text style={styles.yukleniyorText}>Yükleniyor...</Text>
+                <View style={styles.veriYok}>
+                    <Image style={styles.image}
+                        source={require('../images/01.gif')} />
+                    <Text style={styles.yukleniyorText}>Veri Yok!</Text>
                 </View>
             )
         }
+
+        return (
+            <View style={styles.yukleniyorView}>
+                <Spinner color='red' />
+                <Text style={styles.yukleniyorText}>Yükleniyor...</Text>
+            </View>
+        )
     }
 
     async AddFirebase() {
@@ -312,49 +331,7 @@ class Main extends Component {
         );
     }
 
-    Profil() {
-        return (
-            <View>
-                <Text>
-                    Profil
-                </Text>
-            </View>
-        );
-    }
-
     render() {
-        const { biometryType } = this.state;
-        if (this.state.modalVisible === true) {
-            if (biometryType === BiometryTypes.Biometrics) {
-                rnBiometrics.createKeys('Confirm fingerprint')
-                    .then((resultObject) => {
-                        const { publicKey } = resultObject
-                        //alert(publicKey)
-                    }).catch((error) => {
-                        console.log(error)
-                    })
-
-                rnBiometrics.createSignature({
-                    promptMessage: 'Parmak İzi Doğrula',
-                    payload: payload
-                })
-                    .then((resultObject) => {
-                        const { success, signature } = resultObject
-
-                        if (success) {
-                            this.setState({ bioModalVisible: true })
-                        }
-                        else {
-                            alert("Parmak İzi Doğrulanamadı!")
-                        }
-                    }).catch((error) => {
-                        console.log(error)
-                    });
-            } else {
-                this.setState({ bioModalVisible: true })
-            }
-        }
-
         return (
             <Tab.Navigator
                 screenOptions={({ route }) => ({
@@ -383,7 +360,6 @@ class Main extends Component {
             >
                 <Tab.Screen name="Şifreler" component={this.Passwords.bind(this)} />
                 <Tab.Screen name="Şifre Oluştur Ekle" component={this.AddPassword.bind(this)} />
-                {/* <Tab.Screen name="Profil" component={this.Profil.bind(this)} /> */}
             </Tab.Navigator>
         )
     }
