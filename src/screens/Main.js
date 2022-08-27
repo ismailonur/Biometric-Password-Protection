@@ -49,6 +49,22 @@ class Main extends Component {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextState.allPassword !== this.state.allPassword) {
+            return true
+        }
+        if (nextState.retVal !== this.state.retVal) {
+            return true
+        }
+        if (nextState.modalVisible !== this.state.modalVisible) {
+            return true
+        }
+        if (nextState.bioModalVisible !== this.state.bioModalVisible) {
+            return true
+        }
+        return nextProps !== this.props && nextState !== this.state;
+    }
+
     handleBackButton = () => {
         Alert.alert(
             'Uygulamadan Çık',
@@ -84,7 +100,7 @@ class Main extends Component {
     }
 
     generatePassword() {
-        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!^&*_+|?><,-=",
+        let charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!^&*_+|?><,-=",
             retValFor = "";
         for (let i = 0, n = charset.length; i < this.state.charLength; ++i) {
             retValFor += charset.charAt(Math.floor(Math.random() * n));
